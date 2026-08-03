@@ -1,0 +1,16 @@
+---
+import EditorialPage from "../../components/EditorialPage.astro";
+import { pageSlugs, type PageSlug } from "../../content/detail-pages";
+
+export function getStaticPaths() {
+  return pageSlugs.map((slug) => ({ params: { slug }, props: { slug } }));
+}
+
+interface Props {
+  slug: PageSlug;
+}
+
+const { slug } = Astro.props;
+---
+
+<EditorialPage locale="it" slug={slug} />

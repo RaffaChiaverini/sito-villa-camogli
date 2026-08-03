@@ -1,0 +1,354 @@
+---
+import type { SiteContent } from "../types";
+import { primaryPageNavigation, type PageSlug } from "../content/detail-pages";
+
+interface Props {
+  content: SiteContent;
+  detailPage?: boolean;
+  currentSlug?: PageSlug;
+}
+
+const { content, detailPage = false, currentSlug } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const homeHref = content.locale === "it" ? `${base}it/` : base;
+const alternateHome = content.alternateLocale === "it" ? `${base}it/` : base;
+const alternateHref = detailPage && currentSlug ? `${alternateHome}${currentSlug}/` : alternateHome;
+const pageHref = (slug: PageSlug) => `${homeHref}${slug}/`;
+const bookingHref = detailPage ? pageHref("availability") : "#booking";
+const navigation = detailPage
+  ? primaryPageNavigation(content.locale).map((item) => ({
+      id: item.slug,
+      label: item.label,
+      href: pageHref(item.slug),
+    }))
+  : content.navigation.items;
+---
+
+<a class="skip-link" href="#main">{content.navigation.skipLabel}</a>
+<header class="site-header" data-header>
+  <div class="site-header__inner shell">
+    <a class="brand" href={homeHref}>
+      <svg class="brand__mark" viewBox="0 0 28 32" aria-hidden="true">
+        <path d="M14.4 29.5c.2-11 2.8-20.2 11-27-1 12.6-4.5 22.2-11 27Z"></path>
+        <path d="M13.5 29.5C12 20.5 8.3 14.7 1.7 11.2c1.2 8.3 5.4 14.8 11.8 18.3Z"></path>
+      </svg>
+      <span class="brand__type">
+        <span>Villa dei Limoni</span>
+        <small>Camogli</small>
+      </span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      {navigation.map((item) => (
+        <a href={item.href} aria-current={detailPage && item.id === currentSlug ? "page" : undefined}>{item.label}</a>
+      ))}
+    </nav>
+
+    <div class="header-actions">
+      <a class="language-link" href={alternateHref} hreflang={content.alternateLocale}>
+        {content.alternateLocale.toUpperCase()}
+        <span class="sr-only">— {content.navigation.languageLabel}</span>
+      </a>
+      <a class="header-book" href={bookingHref}>{content.navigation.bookLabel}</a>
+      <button
+        class="menu-toggle"
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label={content.navigation.menuLabel}
+      >
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" data-menu-panel aria-hidden="true" inert>
+    <nav aria-label="Mobile navigation">
+      {navigation.map((item, index) => (
+        <a href={item.href} style={`--menu-index: ${index}`} aria-current={detailPage && item.id === currentSlug ? "page" : undefined}>{item.label}</a>
+      ))}
+    </nav>
+    <div class="mobile-menu__footer">
+      <span>Camogli · Liguria</span>
+      <a href={alternateHref} hreflang={content.alternateLocale}>{content.alternateLanguageName}</a>
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>("[data-header]");
+  const toggle = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+  const panel = document.querySelector<HTMLElement>("[data-menu-panel]");
+
+  const setMenu = (open: boolean) => {
+    if (!toggle || !panel) return;
+    toggle.setAttribute("aria-expanded", String(open));
+    panel.setAttribute("aria-hidden", String(!open));
+    panel.inert = !open;
+    document.body.dataset.menuOpen = String(open);
+    if (open) {
+      window.dispatchEvent(new CustomEvent("villa:overlay", { detail: "menu" }));
+      panel.querySelector<HTMLElement>("a")?.focus();
+    } else toggle.focus();
+  };
+
+  toggle?.addEventListener("click", () => {
+    setMenu(toggle.getAttribute("aria-expanded") !== "true");
+  });
+  panel?.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setMenu(false)));
+  window.addEventListener("villa:overlay", ((event: CustomEvent<string>) => {
+    if (event.detail !== "menu" && toggle?.getAttribute("aria-expanded") === "true") setMenu(false);
+  }) as EventListener);
+  document.addEventListener("keydown", (event) => {
+    if (toggle?.getAttribute("aria-expanded") !== "true") return;
+    if (event.key === "Escape") setMenu(false);
+    if (event.key === "Tab" && panel) {
+      const focusable = [toggle, ...Array.from(panel.querySelectorAll<HTMLElement>("a, button"))];
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }
+  });
+
+  const updateHeader = () => header?.toggleAttribute("data-scrolled", window.scrollY > 48);
+  updateHeader();
+  window.addEventListener("scroll", updateHeader, { passive: true });
+</script>
+
+<style>
+  .site-header {
+    position: fixed;
+    z-index: 90;
+    top: 0;
+    right: 0;
+    left: 0;
+    color: var(--paper);
+    transition:
+      color 500ms var(--ease),
+      background-color 500ms var(--ease),
+      box-shadow 500ms var(--ease);
+  }
+
+  .site-header[data-scrolled] {
+    background: rgb(251 248 241 / 94%);
+    box-shadow: 0 1px 0 var(--rule);
+    color: var(--ink);
+    backdrop-filter: blur(14px);
+  }
+
+  .site-header__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    min-height: 5.5rem;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .brand {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-self: start;
+    gap: 0.7rem;
+    text-decoration: none;
+  }
+
+  .brand__mark {
+    width: 1.45rem;
+    fill: currentColor;
+  }
+
+  .brand__type {
+    display: grid;
+    font-family: var(--font-display);
+    font-size: 1.08rem;
+    font-weight: 430;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+
+  .brand__type small {
+    margin-top: 0.28rem;
+    font-family: var(--font-body);
+    font-size: 0.52rem;
+    font-weight: 600;
+    letter-spacing: 0.23em;
+    text-transform: uppercase;
+  }
+
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.2rem, 2.4vw, 2.5rem);
+  }
+
+  .desktop-nav a,
+  .language-link,
+  .header-book {
+    position: relative;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    font-size: 0.65rem;
+    font-weight: 650;
+    letter-spacing: 0.11em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .desktop-nav a::after {
+    position: absolute;
+    right: 0;
+    bottom: 0.55rem;
+    left: 0;
+    height: 1px;
+    background: currentColor;
+    content: "";
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 450ms var(--ease);
+  }
+
+  .desktop-nav a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    gap: 1.5rem;
+  }
+
+  .header-book {
+    padding-inline: 1rem;
+    border: 1px solid currentColor;
+  }
+
+  .menu-toggle {
+    display: none;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .menu-toggle span {
+    position: absolute;
+    width: 1.35rem;
+    height: 1px;
+    background: currentColor;
+    transition: transform 400ms var(--ease);
+  }
+
+  .menu-toggle span:first-child { transform: translateY(-4px); }
+  .menu-toggle span:last-child { transform: translateY(4px); }
+  .menu-toggle[aria-expanded="true"] span:first-child { transform: rotate(45deg); }
+  .menu-toggle[aria-expanded="true"] span:last-child { transform: rotate(-45deg); }
+
+  .mobile-menu {
+    display: none;
+  }
+
+  @media (max-width: 70rem) {
+    .site-header__inner {
+      grid-template-columns: 1fr auto;
+    }
+
+    .desktop-nav,
+    .header-book {
+      display: none;
+    }
+
+    .menu-toggle {
+      display: inline-flex;
+    }
+
+    .mobile-menu {
+      position: fixed;
+      z-index: 1;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 7.5rem max(1.5rem, calc((100vw - 92rem) / 2));
+      background: var(--ink);
+      color: var(--paper);
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      transform: translateY(-1rem);
+      transition:
+        opacity 450ms var(--ease),
+        transform 450ms var(--ease),
+        visibility 0s linear 450ms;
+    }
+
+    .mobile-menu[aria-hidden="false"] {
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+      transform: none;
+      transition-delay: 0s;
+    }
+
+    .mobile-menu nav {
+      display: grid;
+      gap: 0.15rem;
+    }
+
+    .mobile-menu nav a {
+      display: flex;
+      min-height: 54px;
+      align-items: center;
+      border-bottom: 1px solid rgb(244 240 230 / 15%);
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 7vw, 4rem);
+      font-weight: 380;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+      text-decoration: none;
+    }
+
+  .mobile-menu__footer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 3rem;
+      font-size: 0.67rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .mobile-menu__footer a {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+    body[data-menu-open="true"] .site-header {
+      color: var(--paper);
+    }
+  }
+
+  @media (max-width: 34rem) {
+    .site-header__inner {
+      min-height: 4.75rem;
+    }
+
+    .brand__type span { font-size: 0.95rem; }
+    .language-link { display: none; }
+    .header-actions { gap: 0; }
+  }
+</style>

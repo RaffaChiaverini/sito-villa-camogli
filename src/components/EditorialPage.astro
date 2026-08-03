@@ -1,0 +1,268 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getDetailPage, type PageSlug } from "../content/detail-pages";
+import { getSiteContent } from "../content";
+import { mediaAssets, mediaById } from "../content/media";
+import { bookingPlatforms, canonicalFacts, propertyIdentity } from "../data/property-facts";
+import type { Locale } from "../types";
+import Gallery, { type GalleryImage } from "./Gallery.astro";
+import Navigation from "./Navigation.astro";
+import PrototypePicture from "./PrototypePicture.astro";
+import SiteFooter from "./SiteFooter.astro";
+
+interface Props {
+  locale: Locale;
+  slug: PageSlug;
+}
+
+const { locale, slug } = Astro.props;
+const content = getSiteContent(locale);
+const page = getDetailPage(locale, slug);
+const base = import.meta.env.BASE_URL;
+const localeRoot = locale === "it" ? `${base}it/` : base;
+const alternateRoot = locale === "en" ? `${base}it/` : base;
+const alternateHref = `${alternateRoot}${slug}/`;
+const homeHref = localeRoot;
+const mediaPath = (src: string) => `${base}${src.replace(/^\//, "")}`;
+const hero = mediaAssets.find((item) => item.id === page.heroImageId) ?? mediaById["hero-view"];
+
+const chapterFor = (item: (typeof mediaAssets)[number]) => {
+  if (["outdoor-dining", "outdoor-table", "outdoor-oven"].includes(item.id)) return "outdoor-dining";
+  if (item.chapter === "outdoor-life") return "pool-garden";
+  if (item.chapter === "interiors") return "living";
+  if (item.chapter === "sleeping") return "bedrooms";
+  if (item.chapter === "pool-cottage") return "cottage";
+  if (item.chapter === "the-villa" || item.chapter === "after-dark") return "views";
+  return item.chapter;
+};
+
+const galleryImages: GalleryImage[] = mediaAssets.slice(0, 22).map((item) => ({
+  id: item.id,
+  src: mediaPath(item.src),
+  alt: item.alt[locale],
+  caption: item.alt[locale].replace(/^Destination (image|context):\s*/i, ""),
+  chapter: chapterFor(item),
+  width: item.width,
+  height: item.height,
+  focalPosition: item.focalPosition,
+}));
+const visibleChapters = content.gallery.chapters
+  .filter((chapter) => galleryImages.some((image) => image.chapter === chapter.id))
+  .map(({ id, label }) => ({ id, label }));
+
+const canonicalOrigin = Astro.site ?? Astro.url.origin;
+const siteUrl = new URL(base, canonicalOrigin).href;
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}#website`,
+      url: siteUrl,
+      name: propertyIdentity.name,
+      inLanguage: ["en", "it"],
+    },
+    {
+      "@type": "VacationRental",
+      "@id": `${siteUrl}#villa`,
+      name: propertyIdentity.name,
+      url: siteUrl,
+      description: content.seo.description,
+      image: [new URL(mediaPath(hero.src), canonicalOrigin).href],
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: propertyIdentity.locality,
+        addressRegion: propertyIdentity.region,
+        addressCountry: propertyIdentity.country,
+      },
+      availableLanguage: ["en", "it"],
+      currenciesAccepted: "EUR",
+      checkoutTime: canonicalFacts.stay.checkout,
+      petsAllowed: canonicalFacts.policies.petsAllowed,
+      numberOfRooms: {
+        "@type": "QuantitativeValue",
+        value: canonicalFacts.mainVilla.bedrooms,
+        unitText: "bedrooms in the main villa",
+      },
+      identifier: [
+        { "@type": "PropertyValue", propertyID: "CIN", value: propertyIdentity.cin },
+        { "@type": "PropertyValue", propertyID: "CITRA", value: propertyIdentity.citra },
+      ],
+      amenityFeature: [
+        { "@type": "LocationFeatureSpecification", name: "Private swimming pool", value: true },
+        { "@type": "LocationFeatureSpecification", name: "Sea view", value: true },
+        { "@type": "LocationFeatureSpecification", name: "Air conditioning in bedrooms", value: true },
+        { "@type": "LocationFeatureSpecification", name: "Two private garages", value: true },
+        { "@type": "LocationFeatureSpecification", name: "Wi-Fi", value: true },
+      ],
+      sameAs: [bookingPlatforms.airbnb, bookingPlatforms.vrbo],
+    },
+    {
+      "@type": "WebPage",
+      "@id": `${Astro.url.href}#page`,
+      url: Astro.url.href,
+      name: page.title,
+      description: page.seoDescription,
+      inLanguage: locale,
+      isPartOf: { "@id": `${siteUrl}#website` },
+      about: { "@id": `${siteUrl}#villa` },
+    },
+    ...(slug === "policies"
+      ? [{
+          "@type": "FAQPage",
+          "@id": `${Astro.url.href}#faq`,
+          mainEntity: content.faq.items.map((item) => ({
+            "@type": "Question",
+            name: item.question,
+            acceptedAnswer: { "@type": "Answer", text: item.answer },
+          })),
+        }]
+      : []),
+  ],
+};
+---
+
+<BaseLayout
+  lang={locale}
+  title={`${page.navLabel} | ${content.brandName}`}
+  description={page.seoDescription}
+  socialTitle={`${page.title} — ${content.brandName}`}
+  socialDescription={page.intro}
+  alternateHref={alternateHref}
+  alternateLang={content.alternateLocale}
+  socialImage={mediaPath(hero.src)}
+>
+  <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+  <Navigation content={content} detailPage currentSlug={slug} />
+
+  <main id="main">
+    <header class="editorial-hero">
+      <div class="editorial-hero__media" data-motion>
+        <PrototypePicture src={hero.src} alt={hero.alt[locale]} width={hero.width} height={hero.height} focalPosition={hero.focalPosition} loading="eager" fetchpriority="high" sizes="100vw" />
+      </div>
+      <div class="editorial-hero__wash"></div>
+      <div class="shell editorial-hero__content">
+        <nav aria-label={locale === "en" ? "Breadcrumb" : "Percorso di navigazione"}>
+          <a href={homeHref}>{locale === "en" ? "Home" : "Home"}</a><span aria-hidden="true">/</span><span aria-current="page">{page.navLabel}</span>
+        </nav>
+        <p class="eyebrow eyebrow--light">{page.eyebrow}</p>
+        <h1>{page.title}</h1>
+        <p class="editorial-hero__intro">{page.intro}</p>
+        {page.updatedLabel && <p class="editorial-hero__updated">{page.updatedLabel}</p>}
+      </div>
+    </header>
+
+    <div class="page-index surface-ink">
+      <nav class="shell" aria-label={locale === "en" ? "On this page" : "In questa pagina"}>
+        {page.sections.map((section, index) => <a href={`#${section.id}`}><span>{String(index + 1).padStart(2, "0")}</span>{section.title}</a>)}
+      </nav>
+    </div>
+
+    {page.showGallery && (
+      <section class="section detail-gallery" aria-labelledby="gallery-title">
+        <div class="shell">
+          <div class="detail-gallery__heading">
+            <p class="eyebrow">{content.gallery.eyebrow}</p>
+            <h2 class="section-title" id="gallery-title">{content.gallery.title}</h2>
+          </div>
+          <Gallery images={galleryImages} chapters={visibleChapters} labels={{ all: content.gallery.allLabel, open: content.gallery.openLabel, close: content.gallery.closeLabel, previous: content.gallery.previousLabel, next: content.gallery.nextLabel, counter: content.gallery.counterLabel }} />
+        </div>
+      </section>
+    )}
+
+    <div class="detail-sections">
+      {page.sections.map((section, sectionIndex) => (
+        <section class={`section detail-section ${sectionIndex % 2 === 1 ? "detail-section--tinted" : ""}`} id={section.id}>
+          <div class="shell detail-section__grid">
+            <header data-reveal data-motion>
+              <p class="eyebrow">{section.eyebrow ?? `${String(sectionIndex + 1).padStart(2, "0")} · ${page.navLabel}`}</p>
+              <h2 class="section-title">{section.title}</h2>
+            </header>
+            <div class="detail-section__body">
+              {section.paragraphs?.map((paragraph) => <p class="detail-section__paragraph" data-reveal data-motion>{paragraph}</p>)}
+              {section.items && (
+                <div class="detail-cards">
+                  {section.items.map((item) => (
+                    <article class="detail-card" data-reveal data-motion>
+                      {item.meta && <span>{item.meta}</span>}
+                      <h3>{item.title}</h3>
+                      {item.description && <p>{item.description}</p>}
+                      {item.href && <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}>{locale === "en" ? "Open" : "Apri"}<span aria-hidden="true">↗</span></a>}
+                    </article>
+                  ))}
+                </div>
+              )}
+              {section.notice && <aside class="detail-notice"><span>{locale === "en" ? "Good to know" : "Da sapere"}</span><p>{section.notice}</p></aside>}
+            </div>
+          </div>
+        </section>
+      ))}
+    </div>
+
+    {page.showPlatforms && (
+      <section class="detail-conversion surface-blue" aria-labelledby="conversion-title">
+        <div class="shell">
+          <p class="eyebrow eyebrow--light">{content.booking.eyebrow}</p>
+          <h2 id="conversion-title">{locale === "en" ? "See current dates on your preferred platform." : "Verifica le date sulla piattaforma che preferisci."}</h2>
+          <p>{content.booking.platformNote}</p>
+          <div>
+            {content.platforms.map((platform) => <a class="button button--light" href={platform.url} target="_blank" rel="noopener noreferrer" aria-label={platform.externalLabel}>{platform.availabilityCta}<span aria-hidden="true">↗</span></a>)}
+          </div>
+        </div>
+      </section>
+    )}
+  </main>
+
+  <SiteFooter content={content} alternateHref={alternateHref} />
+  {slug !== "availability" && <a class="availability-tab" href={`${localeRoot}availability/`}>{content.navigation.bookLabel}<span aria-hidden="true">↗</span></a>}
+</BaseLayout>
+
+<style>
+  .editorial-hero { position: relative; min-height: min(78rem, 88svh); overflow: hidden; background: var(--ink); color: var(--paper); }
+  .editorial-hero__media, .editorial-hero__wash { position: absolute; inset: 0; }
+  .editorial-hero__media img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.015); }
+  .editorial-hero__wash { background: linear-gradient(90deg, rgb(8 20 18 / 75%) 0%, rgb(8 20 18 / 30%) 66%, rgb(8 20 18 / 14%)), linear-gradient(0deg, rgb(8 20 18 / 65%), transparent 58%); }
+  .editorial-hero__content { position: relative; display: flex; min-height: min(78rem, 88svh); flex-direction: column; justify-content: flex-end; padding-top: 9rem; padding-bottom: clamp(3.5rem, 8vh, 7rem); }
+  .editorial-hero nav { display: flex; gap: .7rem; margin-bottom: clamp(2.5rem, 8vh, 7rem); color: rgb(244 240 230 / 64%); font-size: .66rem; letter-spacing: .11em; text-transform: uppercase; }
+  .editorial-hero nav a { min-height: 44px; display: inline-flex; align-items: center; text-decoration: none; }
+  .editorial-hero h1 { max-width: 13ch; margin: 0; font-family: var(--font-display); font-size: clamp(3.5rem, 7.6vw, 8.6rem); font-weight: 360; letter-spacing: -.045em; line-height: .9; text-wrap: balance; }
+  .editorial-hero__intro { max-width: 48rem; margin: 1.75rem 0 0; font-family: var(--font-display); font-size: clamp(1.25rem, 2vw, 1.75rem); font-weight: 340; line-height: 1.4; }
+  .editorial-hero__updated { margin: 1.5rem 0 0; color: rgb(244 240 230 / 62%); font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; }
+  .page-index nav { display: flex; min-height: 6.5rem; align-items: stretch; overflow-x: auto; }
+  .page-index a { display: flex; min-width: min(18rem, 70vw); align-items: center; gap: .8rem; padding: 1rem 2rem; border-right: 1px solid rgb(244 240 230 / 13%); color: rgb(244 240 230 / 76%); font-size: .68rem; font-weight: 620; letter-spacing: .08em; line-height: 1.4; text-decoration: none; text-transform: uppercase; }
+  .page-index a:first-child { padding-left: 0; }
+  .page-index a span { color: var(--citrus); }
+  .detail-section--tinted { background: var(--ivory); }
+  .detail-section__grid { display: grid; grid-template-columns: minmax(18rem, .72fr) minmax(0, 1.28fr); gap: clamp(3rem, 8vw, 9rem); }
+  .detail-section__grid > header { position: sticky; top: 8rem; align-self: start; }
+  .detail-section__paragraph { max-width: 48rem; margin: 0 0 1.35rem; color: var(--ink-soft); font-family: var(--font-display); font-size: clamp(1.3rem, 2vw, 1.8rem); line-height: 1.45; }
+  .detail-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 2.75rem; border-top: 1px solid var(--rule); }
+  .detail-card { position: relative; min-height: 13rem; padding: 2rem; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .detail-card:nth-child(2n) { border-right: 0; }
+  .detail-card > span { display: block; margin-bottom: 1.3rem; color: var(--terracotta); font-size: .64rem; font-weight: 650; letter-spacing: .1em; text-transform: uppercase; }
+  .detail-card h3 { margin: 0; font-family: var(--font-display); font-size: clamp(1.45rem, 2vw, 2.15rem); font-weight: 400; line-height: 1.1; }
+  .detail-card p { margin: 1rem 0 0; color: var(--ink-soft); font-size: .9rem; }
+  .detail-card a { display: inline-flex; min-height: 44px; align-items: center; gap: .6rem; margin-top: 1.2rem; font-size: .66rem; font-weight: 650; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; }
+  .detail-notice { margin-top: 3rem; padding: 1.5rem 1.75rem; border-left: 2px solid var(--terracotta); background: rgb(216 208 193 / 35%); }
+  .detail-notice span { color: var(--terracotta); font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .detail-notice p { max-width: 48rem; margin: .6rem 0 0; color: var(--ink-soft); }
+  .detail-gallery__heading { display: grid; grid-template-columns: 1fr 2fr; margin-bottom: 3rem; }
+  .detail-conversion { padding-block: clamp(5rem, 10vw, 10rem); }
+  .detail-conversion h2 { max-width: 13ch; margin: 0; font-family: var(--font-display); font-size: clamp(3rem, 6vw, 6.5rem); font-weight: 360; letter-spacing: -.04em; line-height: .95; }
+  .detail-conversion p { max-width: 42rem; margin: 2rem 0; color: rgb(244 240 230 / 75%); }
+  .detail-conversion > div > div { display: flex; flex-wrap: wrap; gap: .75rem; }
+  .availability-tab { position: fixed; z-index: 70; right: 1rem; bottom: 1rem; display: inline-flex; min-height: 3.2rem; align-items: center; gap: .7rem; padding: .8rem 1.05rem; background: var(--terracotta); color: var(--paper); font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; box-shadow: 0 12px 35px rgb(23 35 31 / 24%); }
+  @media (max-width: 58rem) {
+    .detail-section__grid { grid-template-columns: 1fr; }
+    .detail-section__grid > header { position: static; }
+  }
+  @media (max-width: 40rem) {
+    .editorial-hero { min-height: 84svh; }
+    .editorial-hero__content { min-height: 84svh; padding-bottom: 3rem; }
+    .editorial-hero nav { margin-bottom: 2rem; }
+    .detail-cards { grid-template-columns: 1fr; }
+    .detail-card { min-height: 0; padding: 1.5rem 0; border-right: 0; }
+    .detail-gallery__heading { grid-template-columns: 1fr; }
+    .availability-tab { right: .75rem; bottom: .75rem; left: .75rem; justify-content: center; }
+  }
+</style>

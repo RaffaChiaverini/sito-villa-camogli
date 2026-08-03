@@ -1,0 +1,219 @@
+---
+export interface GalleryImage {
+  id: string;
+  src: string;
+  alt: string;
+  caption: string;
+  chapter: string;
+  width: number;
+  height: number;
+  focalPosition: string;
+}
+
+interface Props {
+  images: GalleryImage[];
+  chapters: { id: string; label: string }[];
+  labels: {
+    all: string;
+    open: string;
+    close: string;
+    previous: string;
+    next: string;
+    counter: string;
+  };
+}
+
+const { images, chapters, labels } = Astro.props;
+---
+
+<div class="gallery-app" data-gallery-root data-label-counter={labels.counter}>
+  <div class="gallery-filters" aria-label="Gallery filters">
+    <button class="is-active" type="button" aria-pressed="true" data-gallery-filter="all">{labels.all}</button>
+    {chapters.map((chapter) => (
+      <button type="button" aria-pressed="false" data-gallery-filter={chapter.id}>{chapter.label}</button>
+    ))}
+  </div>
+
+  <div class="gallery-grid" aria-live="polite">
+    {images.map((image, index) => (
+      <button
+        class={`gallery-tile tile-${index % 7}`}
+        type="button"
+        data-lightbox-trigger
+        data-gallery-index={String(index)}
+        data-gallery-chapter={image.chapter}
+        data-image-src={image.src}
+        data-image-alt={image.alt}
+        data-image-caption={image.caption}
+        data-image-width={String(image.width)}
+        data-image-height={String(image.height)}
+        data-image-focal={image.focalPosition}
+        hidden={index >= 12}
+      >
+        <picture>
+          <source srcset={`${image.src.replace(/\.jpg$/i, "-640.avif")} 640w, ${image.src.replace(/\.jpg$/i, "-960.avif")} 960w, ${image.src.replace(/\.jpg$/i, ".avif")} ${image.width}w`} sizes="(max-width: 560px) 82vw, (max-width: 864px) 50vw, 40vw" type="image/avif" />
+          <source srcset={`${image.src.replace(/\.jpg$/i, "-640.webp")} 640w, ${image.src.replace(/\.jpg$/i, "-960.webp")} 960w, ${image.src.replace(/\.jpg$/i, ".webp")} ${image.width}w`} sizes="(max-width: 560px) 82vw, (max-width: 864px) 50vw, 40vw" type="image/webp" />
+          <img src={image.src} alt="" width={image.width} height={image.height} loading="lazy" decoding="async" sizes="(max-width: 560px) 82vw, (max-width: 864px) 50vw, 40vw" style={`object-position:${image.focalPosition}`} />
+        </picture>
+        <span class="gallery-tile__caption">
+          <small aria-hidden="true">{String(index + 1).padStart(2, "0")}</small>
+          {image.caption}
+        </span>
+      </button>
+    ))}
+  </div>
+
+  <div class="lightbox" data-lightbox role="dialog" aria-modal="true" aria-label={labels.open} aria-hidden="true">
+    <button class="lightbox__close" type="button" data-lightbox-close aria-label={labels.close}><span aria-hidden="true">×</span></button>
+    <button class="lightbox__nav lightbox__nav--prev" type="button" data-lightbox-prev aria-label={labels.previous}><span aria-hidden="true">←</span></button>
+    <figure>
+      <picture>
+        <source data-lightbox-avif type="image/avif" />
+        <source data-lightbox-webp type="image/webp" />
+        <img data-lightbox-image alt="" />
+      </picture>
+      <figcaption><span data-lightbox-caption></span><small data-lightbox-counter></small></figcaption>
+    </figure>
+    <button class="lightbox__nav lightbox__nav--next" type="button" data-lightbox-next aria-label={labels.next}><span aria-hidden="true">→</span></button>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-gallery-root]").forEach((root) => {
+    const filters = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-gallery-filter]"));
+    const tiles = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-lightbox-trigger]"));
+    const dialog = root.querySelector<HTMLElement>("[data-lightbox]");
+    const closeButton = root.querySelector<HTMLButtonElement>("[data-lightbox-close]");
+    const previous = root.querySelector<HTMLButtonElement>("[data-lightbox-prev]");
+    const next = root.querySelector<HTMLButtonElement>("[data-lightbox-next]");
+    const image = root.querySelector<HTMLImageElement>("[data-lightbox-image]");
+    const avif = root.querySelector<HTMLSourceElement>("[data-lightbox-avif]");
+    const webp = root.querySelector<HTMLSourceElement>("[data-lightbox-webp]");
+    const caption = root.querySelector<HTMLElement>("[data-lightbox-caption]");
+    const counter = root.querySelector<HTMLElement>("[data-lightbox-counter]");
+    let activePosition = 0;
+    let activeTiles = tiles.filter((tile) => !tile.hidden);
+    let opener: HTMLButtonElement | null = null;
+
+    const populate = (tile: HTMLButtonElement) => {
+      if (!tile || !image || !avif || !webp || !caption || !counter) return;
+      activePosition = Math.max(0, activeTiles.indexOf(tile));
+      const src = tile.dataset.imageSrc ?? "";
+      avif.srcset = src.replace(/\.jpg$/i, ".avif");
+      webp.srcset = src.replace(/\.jpg$/i, ".webp");
+      image.src = src;
+      image.alt = tile.dataset.imageAlt ?? "";
+      image.width = Number(tile.dataset.imageWidth ?? 1200);
+      image.height = Number(tile.dataset.imageHeight ?? 900);
+      image.style.objectPosition = tile.dataset.imageFocal ?? "50% 50%";
+      caption.textContent = tile.dataset.imageCaption ?? "";
+      counter.textContent = `${root.dataset.labelCounter} ${activePosition + 1} / ${activeTiles.length}`;
+    };
+
+    const open = (tile: HTMLButtonElement) => {
+      opener = tile;
+      populate(tile);
+      dialog?.setAttribute("aria-hidden", "false");
+      document.body.dataset.modalOpen = "true";
+      window.dispatchEvent(new CustomEvent("villa:overlay", { detail: "gallery" }));
+      closeButton?.focus();
+    };
+
+    const close = () => {
+      dialog?.setAttribute("aria-hidden", "true");
+      document.body.dataset.modalOpen = "false";
+      opener?.focus();
+    };
+
+    const move = (direction: -1 | 1) => {
+      const nextPosition = (activePosition + direction + activeTiles.length) % activeTiles.length;
+      const tile = activeTiles[nextPosition];
+      if (tile) populate(tile);
+    };
+
+    filters.forEach((filter) => filter.addEventListener("click", () => {
+      const chapter = filter.dataset.galleryFilter ?? "all";
+      filters.forEach((item) => {
+        const current = item === filter;
+        item.classList.toggle("is-active", current);
+        item.setAttribute("aria-pressed", String(current));
+      });
+      let visible = 0;
+      tiles.forEach((tile) => {
+        const matches = chapter === "all" || tile.dataset.galleryChapter === chapter;
+        tile.hidden = !matches || visible >= 12;
+        if (matches) visible += 1;
+      });
+      activeTiles = tiles.filter((tile) => !tile.hidden);
+    }));
+
+    tiles.forEach((tile) => tile.addEventListener("click", () => open(tile)));
+    closeButton?.addEventListener("click", close);
+    previous?.addEventListener("click", () => move(-1));
+    next?.addEventListener("click", () => move(1));
+    document.addEventListener("keydown", (event) => {
+      if (dialog?.getAttribute("aria-hidden") !== "false") return;
+      if (event.key === "Escape") close();
+      if (event.key === "ArrowLeft") move(-1);
+      if (event.key === "ArrowRight") move(1);
+      if (event.key === "Tab") {
+        const focusable = Array.from(dialog.querySelectorAll<HTMLElement>("button, [href], [tabindex]:not([tabindex='-1'])"));
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }
+    });
+  });
+</script>
+
+<style>
+  .gallery-app { margin-top: clamp(3rem, 6vw, 6rem); }
+  .gallery-filters { display: flex; gap: .35rem 1.4rem; margin-bottom: 2.5rem; padding-bottom: .85rem; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--rule); }
+  .gallery-filters::-webkit-scrollbar { display: none; }
+  .gallery-filters button { position: relative; min-width: max(44px, max-content); min-height: 44px; padding: 0 .15rem; border: 0; background: transparent; color: var(--ink-soft); cursor: pointer; font: 600 .69rem/1 var(--font-body); letter-spacing: .12em; text-transform: uppercase; }
+  .gallery-filters button::after { position: absolute; right: 0; bottom: -.9rem; left: 0; height: 2px; background: var(--terracotta); content: ''; transform: scaleX(0); transition: transform 400ms var(--ease); }
+  .gallery-filters button.is-active { color: var(--ink); }
+  .gallery-filters button.is-active::after { transform: scaleX(1); }
+  .gallery-grid { display: grid; grid-auto-flow: dense; grid-auto-rows: clamp(13rem, 18vw, 20rem); grid-template-columns: repeat(12, 1fr); gap: clamp(.6rem, 1.2vw, 1.2rem); }
+  .gallery-tile { position: relative; grid-column: span 4; min-height: 44px; padding: 0; overflow: hidden; border: 0; background: var(--ivory); color: var(--paper); cursor: zoom-in; text-align: left; }
+  .gallery-tile[hidden] { display: none; }
+  .gallery-tile.tile-0, .gallery-tile.tile-6 { grid-column: span 7; grid-row: span 2; }
+  .gallery-tile.tile-1, .gallery-tile.tile-5, .gallery-tile.tile-2 { grid-column: span 5; }
+  .gallery-tile.tile-3 { grid-column: span 4; }
+  .gallery-tile.tile-4 { grid-column: span 3; }
+  .gallery-tile picture { display: block; width: 100%; height: 100%; }
+  .gallery-tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 900ms var(--ease), filter 900ms var(--ease); }
+  .gallery-tile::after { position: absolute; inset: 35% 0 0; background: linear-gradient(transparent, rgb(10 18 15 / 68%)); content: ''; }
+  .gallery-tile:hover img { transform: scale(1.025); filter: saturate(1.05); }
+  .gallery-tile__caption { position: absolute; z-index: 1; right: 1.1rem; bottom: 1rem; left: 1.1rem; display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; font-family: var(--font-display); font-size: 1.25rem; line-height: 1.1; }
+  .gallery-tile__caption small { font: 600 .66rem/1 var(--font-body); letter-spacing: .14em; }
+  .lightbox { position: fixed; z-index: 200; inset: 0; display: grid; place-items: center; padding: 4.5rem clamp(1rem, 6vw, 7rem) 2rem; background: rgb(10 18 15 / 97%); color: var(--paper); opacity: 0; pointer-events: none; visibility: hidden; transition: opacity 400ms var(--ease), visibility 0s linear 400ms; }
+  .lightbox[aria-hidden='false'] { opacity: 1; pointer-events: auto; visibility: visible; transition-delay: 0s; }
+  .lightbox figure { display: grid; max-width: min(86vw, 92rem); max-height: 86vh; margin: 0; place-items: center; }
+  .lightbox figure picture { display: grid; max-width: 100%; max-height: 74vh; place-items: center; }
+  .lightbox figure img { max-width: 100%; max-height: 74vh; object-fit: contain; }
+  .lightbox figcaption { display: flex; width: 100%; justify-content: space-between; gap: 2rem; margin-top: 1rem; font-size: .86rem; }
+  .lightbox figcaption small { color: rgb(244 240 230 / 72%); font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; }
+  .lightbox button { position: absolute; display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid rgb(244 240 230 / 35%); background: transparent; color: inherit; cursor: pointer; font-size: 1.35rem; }
+  .lightbox__close { top: 1rem; right: 1rem; }
+  .lightbox__nav { top: 50%; transform: translateY(-50%); }
+  .lightbox__nav--prev { left: 1rem; }
+  .lightbox__nav--next { right: 1rem; }
+  @media (max-width: 54rem) {
+    .gallery-grid { grid-auto-rows: 15rem; grid-template-columns: repeat(6, 1fr); }
+    .gallery-tile, .gallery-tile.tile-0, .gallery-tile.tile-1, .gallery-tile.tile-2, .gallery-tile.tile-3, .gallery-tile.tile-4, .gallery-tile.tile-5, .gallery-tile.tile-6 { grid-column: span 3; grid-row: span 1; }
+    .gallery-tile.tile-0, .gallery-tile.tile-4 { grid-column: span 6; grid-row: span 2; }
+  }
+  @media (max-width: 35rem) {
+    .gallery-grid { display: flex; gap: .8rem; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: -1rem; padding-inline: 1rem 4rem; }
+    .gallery-tile, .gallery-tile.tile-0, .gallery-tile.tile-1, .gallery-tile.tile-2, .gallery-tile.tile-3, .gallery-tile.tile-4, .gallery-tile.tile-5, .gallery-tile.tile-6 { width: 82vw; min-width: 82vw; height: 29rem; scroll-snap-align: center; }
+    .lightbox { padding: 4.5rem 1rem 5rem; }
+    .lightbox figure img { max-height: 67vh; }
+    .lightbox__nav { top: auto; bottom: 1rem; transform: none; }
+    .lightbox__nav--prev { left: calc(50% - 3.5rem); }
+    .lightbox__nav--next { right: calc(50% - 3.5rem); }
+    .lightbox figcaption { display: grid; gap: .35rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .gallery-tile img, .lightbox { transition-duration: .01ms; } }
+</style>

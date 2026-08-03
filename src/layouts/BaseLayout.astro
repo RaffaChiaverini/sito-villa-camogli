@@ -1,0 +1,93 @@
+---
+import "../styles/global.css";
+import newsreaderFont from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url";
+import manropeFont from "@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2?url";
+
+interface Props {
+  lang: "en" | "it";
+  title: string;
+  description: string;
+  socialTitle: string;
+  socialDescription: string;
+  alternateHref: string;
+  alternateLang: "en" | "it";
+  socialImage?: string;
+  noindex?: boolean;
+}
+
+const {
+  lang,
+  title,
+  description,
+  socialTitle,
+  socialDescription,
+  alternateHref,
+  alternateLang,
+  socialImage,
+  noindex = false,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
+const alternate = new URL(alternateHref, Astro.site ?? Astro.url.origin);
+const base = import.meta.env.BASE_URL;
+const ogImage = new URL(socialImage ?? `${base}media/prototype/villa/outdoor-pool-wide.jpg`, Astro.site ?? Astro.url.origin);
+const defaultHref = lang === "en" ? canonical : alternateLang === "en" ? alternate : canonical;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#17231f" />
+    <link rel="preload" href={newsreaderFont} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={manropeFont} as="font" type="font/woff2" crossorigin />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="generator" content={Astro.generator} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={alternateLang} href={alternate} />
+    <link rel="alternate" hreflang={lang} href={canonical} />
+    <link rel="alternate" hreflang="x-default" href={defaultHref} />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="manifest" href={`${base}site.webmanifest`} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Villa dei Limoni" />
+    <meta property="og:locale" content={lang === "en" ? "en_GB" : "it_IT"} />
+    <meta property="og:locale:alternate" content={lang === "en" ? "it_IT" : "en_GB"} />
+    <meta property="og:title" content={socialTitle} />
+    <meta property="og:description" content={socialDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="800" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={socialTitle} />
+    <meta name="twitter:description" content={socialDescription} />
+    <meta name="twitter:image" content={ogImage} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <slot />
+    <script is:inline>
+      document.documentElement.classList.add("js");
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!reduceMotion) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.setAttribute("data-visible", "true");
+                observer.unobserve(entry.target);
+              }
+            }
+          },
+          { rootMargin: "0px 0px -10%", threshold: 0.08 },
+        );
+        document.querySelectorAll("[data-reveal]").forEach((node) => observer.observe(node));
+      } else {
+        document.querySelectorAll("[data-reveal]").forEach((node) => node.setAttribute("data-visible", "true"));
+      }
+    </script>
+  </body>
+</html>

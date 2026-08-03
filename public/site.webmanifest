@@ -1,0 +1,11 @@
+{
+  "name": "Villa dei Limoni",
+  "short_name": "Villa dei Limoni",
+  "description": "A private Ligurian villa above Camogli.",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "theme_color": "#17231f",
+  "background_color": "#fbf8f1",
+  "display": "standalone"
+}
