@@ -4,7 +4,7 @@ const isPages = process.env.GITHUB_ACTIONS === "true";
 
 export default defineConfig({
   site: "https://raffachiaverini.github.io",
-  base: isPages ? "/camogli" : "/",
+  base: isPages ? "/sito-villa-camogli" : "/",
   integrations: [],
   output: "static",
   trailingSlash: "always",
