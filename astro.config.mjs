@@ -3,7 +3,7 @@ import { defineConfig } from "astro/config";
 const isPages = process.env.GITHUB_ACTIONS === "true";
 
 export default defineConfig({
-  site: "https://chiaverini-raffaele_bcgprod.github.io",
+  site: "https://raffachiaverini.github.io",
   base: isPages ? "/camogli" : "/",
   integrations: [],
   output: "static",
