@@ -1,4 +1,4 @@
-export type Locale = "en" | "it";
+export type Locale = "en" | "it" | "fr" | "es";
 
 export type SectionId =
   | "experience"
@@ -284,8 +284,8 @@ export interface GalleryAsset {
   src: string;
   width: number;
   height: number;
-  alt: Record<Locale, string>;
-  caption?: Record<Locale, string>;
+  alt: Partial<Record<Locale, string>> & Pick<Record<Locale, string>, "en" | "it">;
+  caption?: Partial<Record<Locale, string>>;
   focalPoint?: `${number}% ${number}%`;
   prototypeOnly: boolean;
   provenance: string;

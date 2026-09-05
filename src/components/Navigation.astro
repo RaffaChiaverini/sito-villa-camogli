@@ -1,6 +1,7 @@
 ---
 import type { SiteContent } from "../types";
 import { primaryPageNavigation, type PageSlug } from "../content/detail-pages";
+import { localeHref, localeNames, locales } from "../content";
 
 interface Props {
   content: SiteContent;
@@ -10,18 +11,19 @@ interface Props {
 
 const { content, detailPage = false, currentSlug } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const homeHref = content.locale === "it" ? `${base}it/` : base;
-const alternateHome = content.alternateLocale === "it" ? `${base}it/` : base;
-const alternateHref = detailPage && currentSlug ? `${alternateHome}${currentSlug}/` : alternateHome;
+const homeHref = localeHref(content.locale, base);
+const routeSuffix = detailPage && currentSlug ? `${currentSlug}/` : "";
+const languageLinks = locales.map((locale) => ({ locale, name: localeNames[locale], href: localeHref(locale, base, routeSuffix) }));
 const pageHref = (slug: PageSlug) => `${homeHref}${slug}/`;
-const bookingHref = detailPage ? pageHref("availability") : "#booking";
+const ratesLabel = { en: "Rates", it: "Tariffe", fr: "Tarifs", es: "Tarifas" }[content.locale];
+const ratesHref = pageHref("rates");
 const navigation = detailPage
   ? primaryPageNavigation(content.locale).map((item) => ({
       id: item.slug,
       label: item.label,
       href: pageHref(item.slug),
     }))
-  : content.navigation.items;
+  : [...content.navigation.items, { id: "rates", label: ratesLabel, href: ratesHref }];
 ---
 
 <a class="skip-link" href="#main">{content.navigation.skipLabel}</a>
@@ -45,11 +47,15 @@ const navigation = detailPage
     </nav>
 
     <div class="header-actions">
-      <a class="language-link" href={alternateHref} hreflang={content.alternateLocale}>
-        {content.alternateLocale.toUpperCase()}
-        <span class="sr-only">— {content.navigation.languageLabel}</span>
-      </a>
-      <a class="header-book" href={bookingHref}>{content.navigation.bookLabel}</a>
+      <details class="language-menu">
+        <summary class="language-link" aria-label={content.navigation.languageLabel}>{content.locale.toUpperCase()}</summary>
+        <div class="language-menu__panel">
+          {languageLinks.map(({ locale, name, href }) => (
+            <a href={href} hreflang={locale} lang={locale} aria-current={locale === content.locale ? "page" : undefined} data-locale-choice={locale}>{name}</a>
+          ))}
+        </div>
+      </details>
+      <a class="header-book" href={ratesHref}>{ratesLabel}</a>
       <button
         class="menu-toggle"
         type="button"
@@ -71,7 +77,9 @@ const navigation = detailPage
     </nav>
     <div class="mobile-menu__footer">
       <span>Camogli · Liguria</span>
-      <a href={alternateHref} hreflang={content.alternateLocale}>{content.alternateLanguageName}</a>
+      <div class="mobile-languages" aria-label={content.navigation.languageLabel}>
+        {languageLinks.map(({ locale, name, href }) => <a href={href} hreflang={locale} lang={locale} aria-current={locale === content.locale ? "page" : undefined} data-locale-choice={locale}>{name}</a>)}
+      </div>
     </div>
   </div>
 </header>
@@ -224,6 +232,26 @@ const navigation = detailPage
     justify-self: end;
     gap: 1.5rem;
   }
+
+  .language-menu { position: relative; }
+  .language-menu summary { list-style: none; cursor: pointer; }
+  .language-menu summary::-webkit-details-marker { display: none; }
+  .language-menu__panel {
+    position: absolute;
+    top: calc(100% - .15rem);
+    right: 0;
+    display: grid;
+    min-width: 9rem;
+    padding: .5rem;
+    border: 1px solid var(--rule);
+    background: rgb(251 248 241 / 98%);
+    box-shadow: 0 .75rem 2rem rgb(8 19 17 / 14%);
+    color: var(--ink);
+  }
+  .language-menu__panel a { min-height: 2.5rem; padding: .65rem .75rem; font-size: .65rem; font-weight: 650; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+  .language-menu__panel a:hover { background: var(--sand); }
+  .language-menu__panel a[aria-current="page"] { color: var(--ink-soft); }
+  .mobile-languages { display: flex; flex-wrap: wrap; gap: .25rem 1rem; }
 
   .header-book {
     padding-inline: 1rem;

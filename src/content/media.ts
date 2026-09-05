@@ -37,6 +37,8 @@ export interface PrototypeMediaAsset {
   alt: {
     en: string;
     it: string;
+    fr?: string;
+    es?: string;
   };
   width: number;
   height: number;
@@ -50,6 +52,9 @@ export interface PrototypeMediaAsset {
   destinationOnly?: boolean;
   prototypeOnly: true;
 }
+
+export const mediaAlt = (asset: PrototypeMediaAsset, locale: import("../types").Locale) =>
+  asset.alt[locale] ?? asset.alt.en;
 
 const airbnb = (path: string) => `https://a0.muscache.com/im/pictures/${path}`;
 

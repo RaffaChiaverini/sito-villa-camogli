@@ -1,8 +1,8 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getDetailPage, type PageSlug } from "../content/detail-pages";
-import { getSiteContent } from "../content";
-import { mediaAssets, mediaById } from "../content/media";
+import { getSiteContent, localeHref, locales } from "../content";
+import { mediaAlt, mediaAssets, mediaById } from "../content/media";
 import { bookingPlatforms, canonicalFacts, propertyIdentity } from "../data/property-facts";
 import type { Locale } from "../types";
 import Gallery, { type GalleryImage } from "./Gallery.astro";
@@ -19,9 +19,7 @@ const { locale, slug } = Astro.props;
 const content = getSiteContent(locale);
 const page = getDetailPage(locale, slug);
 const base = import.meta.env.BASE_URL;
-const localeRoot = locale === "it" ? `${base}it/` : base;
-const alternateRoot = locale === "en" ? `${base}it/` : base;
-const alternateHref = `${alternateRoot}${slug}/`;
+const localeRoot = localeHref(locale, base);
 const homeHref = localeRoot;
 const mediaPath = (src: string) => `${base}${src.replace(/^\//, "")}`;
 const hero = mediaAssets.find((item) => item.id === page.heroImageId) ?? mediaById["hero-view"];
@@ -39,8 +37,8 @@ const chapterFor = (item: (typeof mediaAssets)[number]) => {
 const galleryImages: GalleryImage[] = mediaAssets.slice(0, 22).map((item) => ({
   id: item.id,
   src: mediaPath(item.src),
-  alt: item.alt[locale],
-  caption: item.alt[locale].replace(/^Destination (image|context):\s*/i, ""),
+  alt: mediaAlt(item, locale),
+  caption: mediaAlt(item, locale).replace(/^Destination (image|context):\s*/i, ""),
   chapter: chapterFor(item),
   width: item.width,
   height: item.height,
@@ -60,7 +58,7 @@ const structuredData = {
       "@id": `${siteUrl}#website`,
       url: siteUrl,
       name: propertyIdentity.name,
-      inLanguage: ["en", "it"],
+      inLanguage: locales,
     },
     {
       "@type": "VacationRental",
@@ -75,7 +73,7 @@ const structuredData = {
         addressRegion: propertyIdentity.region,
         addressCountry: propertyIdentity.country,
       },
-      availableLanguage: ["en", "it"],
+      availableLanguage: locales,
       currenciesAccepted: "EUR",
       checkoutTime: canonicalFacts.stay.checkout,
       petsAllowed: canonicalFacts.policies.petsAllowed,
@@ -128,8 +126,7 @@ const structuredData = {
   description={page.seoDescription}
   socialTitle={`${page.title} — ${content.brandName}`}
   socialDescription={page.intro}
-  alternateHref={alternateHref}
-  alternateLang={content.alternateLocale}
+  pathSuffix={`${slug}/`}
   socialImage={mediaPath(hero.src)}
 >
   <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
@@ -138,12 +135,12 @@ const structuredData = {
   <main id="main">
     <header class="editorial-hero">
       <div class="editorial-hero__media" data-motion>
-        <PrototypePicture src={hero.src} alt={hero.alt[locale]} width={hero.width} height={hero.height} focalPosition={hero.focalPosition} loading="eager" fetchpriority="high" sizes="100vw" />
+        <PrototypePicture src={hero.src} alt={mediaAlt(hero, locale)} width={hero.width} height={hero.height} focalPosition={hero.focalPosition} loading="eager" fetchpriority="high" sizes="100vw" />
       </div>
       <div class="editorial-hero__wash"></div>
       <div class="shell editorial-hero__content">
-        <nav aria-label={locale === "en" ? "Breadcrumb" : "Percorso di navigazione"}>
-          <a href={homeHref}>{locale === "en" ? "Home" : "Home"}</a><span aria-hidden="true">/</span><span aria-current="page">{page.navLabel}</span>
+        <nav aria-label={{ en: "Breadcrumb", it: "Percorso di navigazione", fr: "Fil d’Ariane", es: "Ruta de navegación" }[locale]}>
+          <a href={homeHref}>Home</a><span aria-hidden="true">/</span><span aria-current="page">{page.navLabel}</span>
         </nav>
         <p class="eyebrow eyebrow--light">{page.eyebrow}</p>
         <h1>{page.title}</h1>
@@ -153,7 +150,7 @@ const structuredData = {
     </header>
 
     <div class="page-index surface-ink">
-      <nav class="shell" aria-label={locale === "en" ? "On this page" : "In questa pagina"}>
+      <nav class="shell" aria-label={{ en: "On this page", it: "In questa pagina", fr: "Sur cette page", es: "En esta página" }[locale]}>
         {page.sections.map((section, index) => <a href={`#${section.id}`}><span>{String(index + 1).padStart(2, "0")}</span>{section.title}</a>)}
       </nav>
     </div>
@@ -187,12 +184,12 @@ const structuredData = {
                       {item.meta && <span>{item.meta}</span>}
                       <h3>{item.title}</h3>
                       {item.description && <p>{item.description}</p>}
-                      {item.href && <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}>{locale === "en" ? "Open" : "Apri"}<span aria-hidden="true">↗</span></a>}
+                      {item.href && <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}>{{ en: "Open", it: "Apri", fr: "Ouvrir", es: "Abrir" }[locale]}<span aria-hidden="true">↗</span></a>}
                     </article>
                   ))}
                 </div>
               )}
-              {section.notice && <aside class="detail-notice"><span>{locale === "en" ? "Good to know" : "Da sapere"}</span><p>{section.notice}</p></aside>}
+              {section.notice && <aside class="detail-notice"><span>{{ en: "Good to know", it: "Da sapere", fr: "À savoir", es: "Información" }[locale]}</span><p>{section.notice}</p></aside>}
             </div>
           </div>
         </section>
@@ -203,7 +200,7 @@ const structuredData = {
       <section class="detail-conversion surface-blue" aria-labelledby="conversion-title">
         <div class="shell">
           <p class="eyebrow eyebrow--light">{content.booking.eyebrow}</p>
-          <h2 id="conversion-title">{locale === "en" ? "See current dates on your preferred platform." : "Verifica le date sulla piattaforma che preferisci."}</h2>
+          <h2 id="conversion-title">{{ en: "See current dates on your preferred platform.", it: "Verifica le date sulla piattaforma che preferisci.", fr: "Consultez les dates disponibles sur la plateforme de votre choix.", es: "Consulta las fechas disponibles en tu plataforma preferida." }[locale]}</h2>
           <p>{content.booking.platformNote}</p>
           <div>
             {content.platforms.map((platform) => <a class="button button--light" href={platform.url} target="_blank" rel="noopener noreferrer" aria-label={platform.externalLabel}>{platform.availabilityCta}<span aria-hidden="true">↗</span></a>)}
@@ -213,8 +210,8 @@ const structuredData = {
     )}
   </main>
 
-  <SiteFooter content={content} alternateHref={alternateHref} />
-  {slug !== "availability" && <a class="availability-tab" href={`${localeRoot}availability/`}>{content.navigation.bookLabel}<span aria-hidden="true">↗</span></a>}
+  <SiteFooter content={content} />
+  {slug !== "rates" && <a class="rates-tab" href={`${localeRoot}rates/`}>{{ en: "Rates", it: "Tariffe", fr: "Tarifs", es: "Tarifas" }[locale]}<span aria-hidden="true">↗</span></a>}
 </BaseLayout>
 
 <style>
@@ -251,7 +248,7 @@ const structuredData = {
   .detail-conversion h2 { max-width: 13ch; margin: 0; font-family: var(--font-display); font-size: clamp(3rem, 6vw, 6.5rem); font-weight: 360; letter-spacing: -.04em; line-height: .95; }
   .detail-conversion p { max-width: 42rem; margin: 2rem 0; color: rgb(244 240 230 / 75%); }
   .detail-conversion > div > div { display: flex; flex-wrap: wrap; gap: .75rem; }
-  .availability-tab { position: fixed; z-index: 70; right: 1rem; bottom: 1rem; display: inline-flex; min-height: 3.2rem; align-items: center; gap: .7rem; padding: .8rem 1.05rem; background: var(--terracotta); color: var(--paper); font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; box-shadow: 0 12px 35px rgb(23 35 31 / 24%); }
+  .rates-tab { position: fixed; z-index: 70; right: 1rem; bottom: 1rem; display: inline-flex; min-height: 3.2rem; align-items: center; gap: .7rem; padding: .8rem 1.05rem; background: var(--terracotta); color: var(--paper); font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; box-shadow: 0 12px 35px rgb(23 35 31 / 24%); }
   @media (max-width: 58rem) {
     .detail-section__grid { grid-template-columns: 1fr; }
     .detail-section__grid > header { position: static; }
@@ -263,6 +260,6 @@ const structuredData = {
     .detail-cards { grid-template-columns: 1fr; }
     .detail-card { min-height: 0; padding: 1.5rem 0; border-right: 0; }
     .detail-gallery__heading { grid-template-columns: 1fr; }
-    .availability-tab { right: .75rem; bottom: .75rem; left: .75rem; justify-content: center; }
+    .rates-tab { right: .75rem; bottom: .75rem; left: .75rem; justify-content: center; }
   }
 </style>

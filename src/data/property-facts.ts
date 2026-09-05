@@ -91,6 +91,24 @@ export const factRail: Record<Locale, PropertyFact[]> = {
     { id: "parking", value: "2", label: "Garage privati" },
     { id: "stay", value: "Stagionale", label: "Formula confermata online" },
   ],
+  fr: [
+    { id: "location", value: "Camogli", label: "Riviera ligure" },
+    { id: "capacity", value: "12–16", label: "Voyageurs", detail: "Villa principale avec maison de piscine en option" },
+    { id: "bedrooms", value: "6 + 1", label: "Chambres", detail: "Plus le salon de la maison de piscine avec canapé-lit" },
+    { id: "pool", value: "40 m²", label: "Piscine privée avec vue mer" },
+    { id: "view", value: "Golfo Paradiso", label: "Vue dégagée sur la mer" },
+    { id: "parking", value: "2", label: "Garages privés" },
+    { id: "stay", value: "Saisonnier", label: "Modalités confirmées en ligne" },
+  ],
+  es: [
+    { id: "location", value: "Camogli", label: "Riviera de Liguria" },
+    { id: "capacity", value: "12–16", label: "Huéspedes", detail: "Villa principal con casa de piscina opcional" },
+    { id: "bedrooms", value: "6 + 1", label: "Dormitorios", detail: "Más el salón de la casa de piscina con sofá cama" },
+    { id: "pool", value: "40 m²", label: "Piscina privada con vistas al mar" },
+    { id: "view", value: "Golfo Paradiso", label: "Vistas abiertas al mar" },
+    { id: "parking", value: "2", label: "Garajes privados" },
+    { id: "stay", value: "Estacional", label: "Condiciones confirmadas en línea" },
+  ],
 };
 
 export const publicPropertyFacts = {

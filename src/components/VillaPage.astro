@@ -4,8 +4,8 @@ import Navigation from "./Navigation.astro";
 import PrototypePicture from "./PrototypePicture.astro";
 import Gallery, { type GalleryImage } from "./Gallery.astro";
 import SiteFooter from "./SiteFooter.astro";
-import { getSiteContent } from "../content";
-import { mediaAssets, mediaById } from "../content/media";
+import { getSiteContent, localeHref, locales } from "../content";
+import { mediaAlt, mediaAssets, mediaById } from "../content/media";
 import { bookingPlatforms, canonicalFacts, propertyIdentity } from "../data/property-facts";
 import type { Locale } from "../types";
 
@@ -15,8 +15,8 @@ interface Props {
 
 const { locale } = Astro.props;
 const content = getSiteContent(locale);
+const ratesHref = `${localeHref(locale, import.meta.env.BASE_URL)}rates/`;
 const base = import.meta.env.BASE_URL;
-const alternateHref = locale === "en" ? `${base}it/` : base;
 const mediaPath = (src: string) => `${base}${src.replace(/^\//, "")}`;
 const asset = (id: keyof typeof mediaById) => mediaById[id];
 
@@ -57,8 +57,8 @@ const galleryImages: GalleryImage[] = galleryOrder
   .map((item) => ({
     id: item.id,
     src: mediaPath(item.src),
-    alt: item.alt[locale],
-    caption: item.alt[locale].replace(/^Destination (image|context):\s*/i, ""),
+    alt: mediaAlt(item, locale),
+    caption: mediaAlt(item, locale).replace(/^Destination (image|context):\s*/i, ""),
     chapter: chapterFor(item),
     width: item.width,
     height: item.height,
@@ -95,7 +95,7 @@ const rentalData = {
     addressRegion: "Liguria",
     addressCountry: "IT",
   },
-  availableLanguage: ["en", "it"],
+  availableLanguage: locales,
   currenciesAccepted: "EUR",
   checkoutTime: canonicalFacts.stay.checkout,
   petsAllowed: canonicalFacts.policies.petsAllowed,
@@ -118,7 +118,7 @@ const rentalData = {
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
-    { "@type": "WebSite", "@id": `${siteUrl}#website`, url: siteUrl, name: propertyIdentity.name, inLanguage: ["en", "it"] },
+    { "@type": "WebSite", "@id": `${siteUrl}#website`, url: siteUrl, name: propertyIdentity.name, inLanguage: locales },
     rentalData,
     { "@type": "WebPage", "@id": `${Astro.url.href}#page`, url: Astro.url.href, name: content.seo.title, inLanguage: locale, isPartOf: { "@id": `${siteUrl}#website` }, about: { "@id": `${siteUrl}#villa` } },
   ],
@@ -131,8 +131,7 @@ const structuredData = {
   description={content.seo.description}
   socialTitle={content.seo.socialTitle}
   socialDescription={content.seo.socialDescription}
-  alternateHref={alternateHref}
-  alternateLang={content.alternateLocale}
+  pathSuffix=""
 >
   <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   <Navigation content={content} />
@@ -142,7 +141,7 @@ const structuredData = {
       <div class="hero__media" data-motion>
         <PrototypePicture
           src={hero.src}
-          alt={hero.alt[locale]}
+          alt={mediaAlt(hero, locale)}
           width={hero.width}
           height={hero.height}
           focalPosition={hero.focalPosition}
@@ -194,10 +193,10 @@ const structuredData = {
       <div class="shell experience__grid">
         <div class="experience__images" data-reveal data-reveal-delay="1" data-motion>
           <figure class="image-wrap experience__portrait">
-            <PrototypePicture src={storyPrimary.src} alt={storyPrimary.alt[locale]} width={storyPrimary.width} height={storyPrimary.height} focalPosition={storyPrimary.focalPosition} />
+            <PrototypePicture src={storyPrimary.src} alt={mediaAlt(storyPrimary, locale)} width={storyPrimary.width} height={storyPrimary.height} focalPosition={storyPrimary.focalPosition} />
           </figure>
           <figure class="image-wrap experience__detail">
-            <PrototypePicture src={storySecondary.src} alt={storySecondary.alt[locale]} width={storySecondary.width} height={storySecondary.height} focalPosition={storySecondary.focalPosition} />
+            <PrototypePicture src={storySecondary.src} alt={mediaAlt(storySecondary, locale)} width={storySecondary.width} height={storySecondary.height} focalPosition={storySecondary.focalPosition} />
           </figure>
           <span class="experience__number" aria-hidden="true">03</span>
         </div>
@@ -229,7 +228,7 @@ const structuredData = {
             return (
               <article class={`stay-mode stay-mode--${index + 1}`} data-reveal data-reveal-delay={String(index + 1)} data-motion>
                 <div class="image-wrap stay-mode__image">
-                  <PrototypePicture src={stayImage.src} alt={stayImage.alt[locale]} width={stayImage.width} height={stayImage.height} focalPosition={stayImage.focalPosition} />
+                  <PrototypePicture src={stayImage.src} alt={mediaAlt(stayImage, locale)} width={stayImage.width} height={stayImage.height} focalPosition={stayImage.focalPosition} />
                   <span class="stay-mode__index">0{index + 1}</span>
                 </div>
                 <div class="stay-mode__content">
@@ -244,7 +243,7 @@ const structuredData = {
                   </dl>
                   <ul>{mode.features.map((feature) => <li>{feature}</li>)}</ul>
                   <p class="stay-mode__note">{mode.note}</p>
-                  <a class="text-link stay-mode__cta" href="#booking">{content.navigation.bookLabel}</a>
+                  <a class="text-link stay-mode__cta" href={ratesHref}>{{ en: "See rates", it: "Vedi le tariffe", fr: "Voir les tarifs", es: "Ver tarifas" }[locale]}</a>
                 </div>
               </article>
             );
@@ -311,7 +310,7 @@ const structuredData = {
     <section class="outdoors" id="outdoors">
       <div class="outdoors__hero">
         <div class="outdoors__media">
-          <PrototypePicture src={outdoorPrimary.src} alt={outdoorPrimary.alt[locale]} width={outdoorPrimary.width} height={outdoorPrimary.height} focalPosition={outdoorPrimary.focalPosition} sizes="100vw" />
+          <PrototypePicture src={outdoorPrimary.src} alt={mediaAlt(outdoorPrimary, locale)} width={outdoorPrimary.width} height={outdoorPrimary.height} focalPosition={outdoorPrimary.focalPosition} sizes="100vw" />
         </div>
         <div class="outdoors__wash"></div>
         <div class="shell outdoors__headline" data-motion>
@@ -326,8 +325,8 @@ const structuredData = {
           <p>{content.outdoors.quote}</p>
         </div>
         <div class="outdoors__collage" data-reveal data-reveal-delay="1" data-motion>
-          <figure class="image-wrap"><PrototypePicture src={outdoorDetail.src} alt={outdoorDetail.alt[locale]} width={outdoorDetail.width} height={outdoorDetail.height} focalPosition={outdoorDetail.focalPosition} /></figure>
-          <figure class="image-wrap"><PrototypePicture src={outdoorOven.src} alt={outdoorOven.alt[locale]} width={outdoorOven.width} height={outdoorOven.height} focalPosition={outdoorOven.focalPosition} /></figure>
+          <figure class="image-wrap"><PrototypePicture src={outdoorDetail.src} alt={mediaAlt(outdoorDetail, locale)} width={outdoorDetail.width} height={outdoorDetail.height} focalPosition={outdoorDetail.focalPosition} /></figure>
+          <figure class="image-wrap"><PrototypePicture src={outdoorOven.src} alt={mediaAlt(outdoorOven, locale)} width={outdoorOven.width} height={outdoorOven.height} focalPosition={outdoorOven.focalPosition} /></figure>
         </div>
         <div class="outdoors__features">
           {content.outdoors.features.map((feature, index) => (
@@ -344,8 +343,8 @@ const structuredData = {
     <section class="section location surface-blue" id="camogli">
       <div class="shell location__grid">
         <figure class="location__image image-wrap" data-reveal data-reveal-delay="1" data-motion>
-          <PrototypePicture src={camogli.src} alt={camogli.alt[locale]} width={camogli.width} height={camogli.height} focalPosition={camogli.focalPosition} />
-          <figcaption>{locale === "en" ? "Destination image · Camogli" : "Immagine della destinazione · Camogli"}</figcaption>
+          <PrototypePicture src={camogli.src} alt={mediaAlt(camogli, locale)} width={camogli.width} height={camogli.height} focalPosition={camogli.focalPosition} />
+          <figcaption>{{ en: "Destination image · Camogli", it: "Immagine della destinazione · Camogli", fr: "Image de la destination · Camogli", es: "Imagen del destino · Camogli" }[locale]}</figcaption>
         </figure>
         <div class="location__text">
           <header class="location__header" data-reveal data-motion>
@@ -365,7 +364,7 @@ const structuredData = {
           ))}
         </div>
         <div class="approx-map" id="location-map" aria-label={content.location.mapLabel} data-reveal data-motion>
-          <div class="approx-map__copy"><span>{content.location.mapLabel}</span><strong>{locale === "en" ? "Above Camogli" : "Sopra Camogli"}</strong><p>{content.location.privacyNote}</p></div>
+          <div class="approx-map__copy"><span>{content.location.mapLabel}</span><strong>{{ en: "Above Camogli", it: "Sopra Camogli", fr: "Au-dessus de Camogli", es: "Sobre Camogli" }[locale]}</strong><p>{content.location.privacyNote}</p></div>
           <p class="approx-map__place" aria-hidden="true">Golfo<br />Paradiso</p>
         </div>
       </div>
@@ -392,7 +391,7 @@ const structuredData = {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {locale === "en" ? `See reviews on ${review.name}` : `Leggi le recensioni su ${review.name}`} ↗
+                {{ en: `See reviews on ${review.name}`, it: `Leggi le recensioni su ${review.name}`, fr: `Voir les avis sur ${review.name}`, es: `Ver opiniones en ${review.name}` }[locale]} ↗
               </a>
             </article>
           ))}
@@ -424,7 +423,7 @@ const structuredData = {
 
     <section class="booking" id="booking">
       <div class="booking__media">
-        <PrototypePicture src={finale.src} alt={finale.alt[locale]} width={finale.width} height={finale.height} focalPosition={finale.focalPosition} sizes="100vw" />
+        <PrototypePicture src={finale.src} alt={mediaAlt(finale, locale)} width={finale.width} height={finale.height} focalPosition={finale.focalPosition} sizes="100vw" />
       </div>
       <div class="booking__wash"></div>
       <div class="shell booking__content" data-motion>
@@ -433,8 +432,8 @@ const structuredData = {
         <p class="booking__lead">{content.booking.lead}</p>
         <div class="booking__facts">
           <div><span>{content.booking.rateLabel}</span><strong>{content.booking.rateValue}</strong><p>{content.booking.rateDetail}</p></div>
-          <div><span>{content.booking.weeklyLabel}</span><strong>7 {locale === "en" ? "nights" : "notti"}</strong><p>{content.booking.weeklyDetail}</p></div>
-          <div><span>{content.booking.taxLabel}</span><strong>{locale === "en" ? "Confirmed at reservation" : "Confermata alla prenotazione"}</strong><p>{content.booking.taxDetail}</p></div>
+          <div><span>{content.booking.weeklyLabel}</span><strong>7 {{ en: "nights", it: "notti", fr: "nuits", es: "noches" }[locale]}</strong><p>{content.booking.weeklyDetail}</p></div>
+          <div><span>{content.booking.taxLabel}</span><strong>{{ en: "Confirmed at reservation", it: "Confermata alla prenotazione", fr: "Confirmée à la réservation", es: "Confirmada al reservar" }[locale]}</strong><p>{content.booking.taxDetail}</p></div>
         </div>
         <div class="booking__actions">
           {content.platforms.map((platform) => (
@@ -448,7 +447,7 @@ const structuredData = {
     </section>
   </main>
 
-  <SiteFooter content={content} alternateHref={alternateHref} />
+  <SiteFooter content={content} />
 
   <div class="mobile-booking">
     <button type="button" data-booking-toggle aria-expanded="false" aria-controls="booking-sheet">{content.navigation.bookLabel}</button>

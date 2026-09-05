@@ -184,20 +184,31 @@ export function getDetailPage(locale: Locale, slug: PageSlug): DetailPageContent
   }
 
   if (slug === "rates") {
+    const cottageSupplement = ratePolicy.poolCottageSupplement;
+
     return {
       ...common,
       navLabel: tr(locale, "Rates", "Tariffe"),
       eyebrow: tr(locale, "Rates", "Tariffe"),
-      title: tr(locale, "Clear guidance, without a misleading total.", "Indicazioni chiare, senza totali fuorvianti."),
-      intro: bookingNotice(locale),
-      seoDescription: tr(locale, "How to check current weekly rates and fees for Villa dei Limoni on Airbnb or Vrbo.", "Come verificare tariffe settimanali e costi aggiornati di Villa dei Limoni su Airbnb o Vrbo."),
+      title: tr(locale, "Seasonal rates for the villa.", "Tariffe stagionali della villa."),
+      intro: tr(locale, "A clear guide to the published rates and supplements. This page is for information only: it has no availability calendar, checkout or direct booking.", "Una guida chiara alle tariffe e ai supplementi pubblicati. Questa pagina è solo informativa: non contiene calendario delle disponibilità, checkout o prenotazione diretta."),
+      seoDescription: tr(locale, "Published weekly rates and supplements for Villa dei Limoni in Camogli.", "Tariffe settimanali e supplementi pubblicati per Villa dei Limoni a Camogli."),
       heroImageId: "outdoor-dining",
       sections: [
         {
           id: "rate-status",
-          title: tr(locale, "Owner-approved seasonal rates are not yet available.", "Le tariffe stagionali approvate dal proprietario non sono ancora disponibili."),
-          paragraphs: [tr(locale, "The Airbnb and Vrbo listings currently differ on cottage supplements and cleaning fees. No amount is published here until one canonical seasonal table is approved.", "Gli annunci Airbnb e Vrbo riportano differenze per supplemento della pool house e pulizie. Nessun importo viene pubblicato qui finché non sarà approvata una tabella stagionale unica.")],
+          title: tr(locale, "Seasonal rates, clearly explained.", "Tariffe stagionali, spiegate con chiarezza."),
+          paragraphs: [tr(locale, "The main-villa price is dynamic and depends on selected dates. We only publish a price where the official listings state it clearly.", "Il prezzo della villa principale è dinamico e dipende dalle date selezionate. Pubblichiamo un importo solo quando gli annunci ufficiali lo indicano chiaramente.")],
           items: [
+            {
+              title: tr(locale, "Pool cottage supplement", "Supplemento pool house"),
+              description: tr(
+                locale,
+                `€${cottageSupplement.minimumWeekly.toLocaleString("en-GB")}–€${cottageSupplement.maximumWeekly.toLocaleString("en-GB")} per week, plus €${cottageSupplement.cleaningAndLinen.toLocaleString("en-GB")} for cleaning and linen. It is available only with the main villa.`,
+                `€${cottageSupplement.minimumWeekly.toLocaleString("it-IT")}–€${cottageSupplement.maximumWeekly.toLocaleString("it-IT")} a settimana, più €${cottageSupplement.cleaningAndLinen.toLocaleString("it-IT")} per pulizia e biancheria. È disponibile solo insieme alla villa principale.`,
+              ),
+              meta: tr(locale, "Current listing range", "Intervallo attuale degli annunci"),
+            },
             { title: tr(locale, "Stay pattern", "Formula di soggiorno"), description: tr(locale, "The Airbnb listing currently presents seven-night stays with Sunday arrivals.", "L’annuncio Airbnb presenta attualmente soggiorni di sette notti con arrivo la domenica."), meta: tr(locale, "Verify the selected season online", "Verifica online la stagione scelta") },
             { title: tr(locale, "Tourist tax", "Imposta di soggiorno"), description: tr(locale, ratePolicy.fees.touristTax.display, "Dovuta secondo le regole aggiornate del Comune di Camogli e confermata alla prenotazione."), meta: tr(locale, "Amount intentionally omitted", "Importo volutamente omesso") },
             { title: tr(locale, "Final total", "Totale finale"), description: tr(locale, "Includes the platform’s current fees, taxes, terms and any promotion.", "Comprende costi, imposte, condizioni ed eventuali promozioni correnti della piattaforma."), meta: tr(locale, "Shown externally", "Mostrato esternamente") },

@@ -1,42 +1,50 @@
 ---
 import { propertyIdentity } from "../data/property-facts";
 import type { SiteContent } from "../types";
+import { localeHref, localeNames, locales } from "../content";
 
 interface Props {
   content: SiteContent;
-  alternateHref: string;
 }
 
-const { content, alternateHref } = Astro.props;
+const { content } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const localeRoot = content.locale === "it" ? `${base}it/` : base;
+const localeRoot = localeHref(content.locale, base);
 const route = (slug: string) => `${localeRoot}${slug}/`;
-const legalLinks = content.locale === "en"
-  ? [
+const legalLinks = {
+  en: [
       ["Privacy", "privacy"],
       ["Cookies", "cookies"],
       ["Accessibility", "accessibility"],
       ["Legal", "legal"],
-    ]
-  : [
+    ],
+  it: [
       ["Privacy", "privacy"],
       ["Cookie", "cookies"],
       ["Accessibilità", "accessibility"],
       ["Note legali", "legal"],
-    ];
-const siteLinks = content.locale === "en"
-  ? [
+    ],
+  fr: [["Confidentialité", "privacy"], ["Cookies", "cookies"], ["Accessibilité", "accessibility"], ["Mentions légales", "legal"]],
+  es: [["Privacidad", "privacy"], ["Cookies", "cookies"], ["Accesibilidad", "accessibility"], ["Aviso legal", "legal"]],
+}[content.locale];
+const siteLinks = {
+  en: [
       ["The villa", "villa"], ["Gallery", "gallery"], ["Rooms & floorplans", "rooms-floorplans"],
-      ["Amenities", "amenities"], ["Rates", "rates"], ["Availability", "availability"],
+      ["Amenities", "amenities"], ["Rates", "rates"],
       ["Location", "location"], ["Experiences", "experiences"], ["Reviews", "reviews"],
       ["Policies", "policies"], ["Contact", "contact"],
-    ]
-  : [
+    ],
+  it: [
       ["La villa", "villa"], ["Galleria", "gallery"], ["Camere e planimetrie", "rooms-floorplans"],
-      ["Dotazioni", "amenities"], ["Tariffe", "rates"], ["Disponibilità", "availability"],
+      ["Dotazioni", "amenities"], ["Tariffe", "rates"],
       ["Posizione", "location"], ["Esperienze", "experiences"], ["Recensioni", "reviews"],
       ["Regole", "policies"], ["Contatti", "contact"],
-    ];
+    ],
+  fr: [["La villa", "villa"], ["Galerie", "gallery"], ["Chambres et plans", "rooms-floorplans"], ["Équipements", "amenities"], ["Tarifs", "rates"], ["Situation", "location"], ["Expériences", "experiences"], ["Avis", "reviews"], ["Conditions", "policies"], ["Contact", "contact"]],
+  es: [["La villa", "villa"], ["Galería", "gallery"], ["Dormitorios y planos", "rooms-floorplans"], ["Servicios", "amenities"], ["Tarifas", "rates"], ["Ubicación", "location"], ["Experiencias", "experiences"], ["Opiniones", "reviews"], ["Normas", "policies"], ["Contacto", "contact"]],
+}[content.locale];
+const languageLinks = locales.map((locale) => ({ locale, name: localeNames[locale], href: localeHref(locale, base) }));
+const factsLabel = { en: "Property facts", it: "Dati della proprietà", fr: "Informations sur la propriété", es: "Datos de la propiedad" }[content.locale];
 ---
 
 <footer class="footer surface-ink">
@@ -48,14 +56,14 @@ const siteLinks = content.locale === "en"
     <div class="footer__links">
       {siteLinks.map(([label, slug]) => <a href={route(slug)}>{label}</a>)}
       {content.platforms.map((platform) => <a href={platform.url} target="_blank" rel="noopener noreferrer" aria-label={platform.externalLabel}>{platform.name} ↗</a>)}
-      <a href={alternateHref} hreflang={content.alternateLocale}>{content.alternateLanguageName}</a>
+      {languageLinks.map(({ locale, name, href }) => <a href={href} hreflang={locale} lang={locale} aria-current={locale === content.locale ? "page" : undefined} data-locale-choice={locale}>{name}</a>)}
     </div>
   </div>
   <div class="shell footer__legal">
     <div>
       {legalLinks.map(([label, slug]) => <a href={route(slug)}>{label}</a>)}
       <a href={`${base}sitemap.xml`}>Sitemap</a>
-      <a href={`${base}property-facts.json`}>{content.locale === "en" ? "Property facts" : "Dati della proprietà"}</a>
+      <a href={`${base}property-facts.json`}>{factsLabel}</a>
     </div>
     <p><strong>CIN</strong> {propertyIdentity.cin} · <strong>CITRA</strong> {propertyIdentity.citra}</p>
   </div>
