@@ -15,24 +15,30 @@ const homeHref = localeHref(content.locale, base);
 const routeSuffix = detailPage && currentSlug ? `${currentSlug}/` : "";
 const languageLinks = locales.map((locale) => ({ locale, name: localeNames[locale], href: localeHref(locale, base, routeSuffix) }));
 const pageHref = (slug: PageSlug) => `${homeHref}${slug}/`;
-const ratesLabel = { en: "Rates", it: "Tariffe", fr: "Tarifs", es: "Tarifas" }[content.locale];
-const ratesHref = pageHref("rates");
-const navigation = detailPage
-  ? primaryPageNavigation(content.locale).map((item) => ({
-      id: item.slug,
-      label: item.label,
-      href: pageHref(item.slug),
-    }))
-  : [...content.navigation.items, { id: "rates", label: ratesLabel, href: ratesHref }];
+const contactLabel = { en: "Book & contact", it: "Prenota e contattaci", fr: "Réserver & contacter", es: "Reservar y contactar" }[content.locale];
+const contactHref = pageHref("contact");
+const propertyChildren = [
+  { id: "rooms-floorplans", label: { en: "Spaces", it: "Spazi", fr: "Espaces", es: "Espacios" }[content.locale], href: pageHref("rooms-floorplans") },
+  { id: "amenities", label: { en: "Amenities", it: "Dotazioni", fr: "Équipements", es: "Servicios" }[content.locale], href: pageHref("amenities") },
+];
+const rateChildren = [{ id: "included", label: { en: "What is included", it: "Cosa è incluso", fr: "Ce qui est inclus", es: "Qué está incluido" }[content.locale], href: `${pageHref("rates")}#rate-status` }];
+const navigation = primaryPageNavigation(content.locale).map((item) => ({
+  id: item.slug,
+  label: item.label,
+  href: pageHref(item.slug),
+  children: item.slug === "villa" ? propertyChildren : item.slug === "rates" ? rateChildren : undefined,
+}));
+const mobileNavigation = navigation.flatMap((item) => item.children ? [item, ...item.children.map((child) => ({ ...child, label: `— ${child.label}` }))] : [item]);
 ---
 
 <a class="skip-link" href="#main">{content.navigation.skipLabel}</a>
 <header class="site-header" data-header>
   <div class="site-header__inner shell">
     <a class="brand" href={homeHref}>
-      <svg class="brand__mark" viewBox="0 0 28 32" aria-hidden="true">
-        <path d="M14.4 29.5c.2-11 2.8-20.2 11-27-1 12.6-4.5 22.2-11 27Z"></path>
-        <path d="M13.5 29.5C12 20.5 8.3 14.7 1.7 11.2c1.2 8.3 5.4 14.8 11.8 18.3Z"></path>
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M15.3 10.1c5.8-.9 10.2 2.8 9.3 8.4-.8 5.2-5 8.6-9.3 9.3-4.3-.7-8.5-4.1-9.3-9.3-.9-5.6 3.5-9.3 9.3-8.4Z"></path>
+        <path d="M15.5 10.1c.7-3.5 3.6-5.6 7.1-5.1-1.4 3.3-4 5.1-7.1 5.1Z"></path>
+        <path d="M15.4 10.2 17 7.5"></path>
       </svg>
       <span class="brand__type">
         <span>Villa dei Limoni</span>
@@ -41,9 +47,12 @@ const navigation = detailPage
     </a>
 
     <nav class="desktop-nav" aria-label="Primary navigation">
-      {navigation.map((item) => (
-        <a href={item.href} aria-current={detailPage && item.id === currentSlug ? "page" : undefined}>{item.label}</a>
-      ))}
+      {navigation.map((item) => item.children ? (
+        <details class="nav-submenu">
+          <summary aria-current={detailPage && item.id === currentSlug ? "page" : undefined}>{item.label}</summary>
+          <div>{item.children.map((child) => <a href={child.href} aria-current={detailPage && child.id === currentSlug ? "page" : undefined}>{child.label}</a>)}</div>
+        </details>
+      ) : <a href={item.href} aria-current={detailPage && item.id === currentSlug ? "page" : undefined}>{item.label}</a>)}
     </nav>
 
     <div class="header-actions">
@@ -55,7 +64,7 @@ const navigation = detailPage
           ))}
         </div>
       </details>
-      <a class="header-book" href={ratesHref}>{ratesLabel}</a>
+      <a class="header-book" href={contactHref}>{contactLabel}</a>
       <button
         class="menu-toggle"
         type="button"
@@ -71,7 +80,7 @@ const navigation = detailPage
 
   <div class="mobile-menu" id="mobile-menu" data-menu-panel aria-hidden="true" inert>
     <nav aria-label="Mobile navigation">
-      {navigation.map((item, index) => (
+      {mobileNavigation.map((item, index) => (
         <a href={item.href} style={`--menu-index: ${index}`} aria-current={detailPage && item.id === currentSlug ? "page" : undefined}>{item.label}</a>
       ))}
     </nav>
@@ -166,8 +175,10 @@ const navigation = detailPage
   }
 
   .brand__mark {
-    width: 1.45rem;
-    fill: currentColor;
+    width: 2.05rem;
+  }
+
+  .brand__mark path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.35; }
   }
 
   .brand__type {
@@ -195,6 +206,7 @@ const navigation = detailPage
   }
 
   .desktop-nav a,
+  .nav-submenu summary,
   .language-link,
   .header-book {
     position: relative;
@@ -220,6 +232,15 @@ const navigation = detailPage
     transform-origin: right;
     transition: transform 450ms var(--ease);
   }
+
+  .nav-submenu { position: relative; }
+  .nav-submenu summary { display: inline-flex; min-height: 44px; align-items: center; list-style: none; cursor: pointer; }
+  .nav-submenu summary::-webkit-details-marker { display: none; }
+  .nav-submenu summary::after { margin-left: .4rem; content: "+"; }
+  .nav-submenu[open] summary::after { content: "−"; }
+  .nav-submenu > div { position: absolute; top: calc(100% - .2rem); left: -.75rem; display: grid; min-width: 10rem; padding: .4rem; border: 1px solid var(--rule); background: rgb(251 248 241 / 98%); box-shadow: 0 .75rem 2rem rgb(8 19 17 / 14%); color: var(--ink); }
+  .nav-submenu > div a { min-height: 2.4rem; padding: .6rem .75rem; font-size: .61rem; }
+  .nav-submenu > div a:hover { background: var(--sand); }
 
   .desktop-nav a:hover::after {
     transform: scaleX(1);

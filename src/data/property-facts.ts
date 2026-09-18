@@ -7,12 +7,9 @@ export const propertyIdentity = {
   country: "IT",
   cin: "IT010007C2DQK53S7U",
   citra: "010007-LT-0063",
+  email: "villadeilimonicamogli@gmail.com",
+  telephone: "+39 339 378 1680",
   lastAudited: "2026-08-03",
-} as const;
-
-export const bookingPlatforms = {
-  airbnb: "https://www.airbnb.it/rooms/23678485",
-  vrbo: "https://www.vrbo.com/it-it/affitto-vacanze/p8718530",
 } as const;
 
 export const canonicalFacts = {
@@ -114,8 +111,11 @@ export const factRail: Record<Locale, PropertyFact[]> = {
 export const publicPropertyFacts = {
   identity: propertyIdentity,
   facts: canonicalFacts,
-  bookingPlatforms,
+  contact: {
+    email: propertyIdentity.email,
+    telephone: propertyIdentity.telephone,
+  },
   pendingOwnerApprovals,
   notice:
-    "Availability, live pricing, cancellation terms, payment and reservations are handled by the official Airbnb and Vrbo listings.",
+    "For availability and direct reservations, contact Villa dei Limoni by email or telephone. The tourist tax is the only cost not included and is paid locally on arrival.",
 } as const;

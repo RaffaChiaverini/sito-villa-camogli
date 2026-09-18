@@ -18,7 +18,7 @@ export const fr: SiteContent = {
     menuLabel: "Menu",
     closeLabel: "Fermer le menu",
     skipLabel: "Aller au contenu",
-    bookLabel: "Voir les disponibilités",
+    bookLabel: "Réserver & contacter",
     languageLabel: "Changer de langue",
     items: [
       { id: "experience", label: "La maison", href: "#experience" },
@@ -31,9 +31,9 @@ export const fr: SiteContent = {
   },
   platforms: en.platforms.map((platform) => ({
     ...platform,
-    shortCta: `Voir sur ${platform.name}`,
-    availabilityCta: `Voir les disponibilités sur ${platform.name}`,
-    externalLabel: `Ouvre l’annonce officielle de Villa dei Limoni sur ${platform.name} dans un nouvel onglet`,
+    shortCta: `Voir les avis sur ${platform.name}`,
+    availabilityCta: `Voir les avis sur ${platform.name}`,
+    externalLabel: `Ouvre les avis de Villa dei Limoni sur ${platform.name} dans un nouvel onglet`,
   })),
   hero: {
     eyebrow: "Camogli · Ligurie",
@@ -128,8 +128,7 @@ export const fr: SiteContent = {
   reviews: {
     eyebrow: "Avis des voyageurs", title: "Un lieu dont on se souvient.", intro: "Les avis des annonces officielles citent souvent la vue, le jardin, la piscine, l’agencement pour les groupes et la communication avec l’hôte.",
     platforms: [
-      { ...en.reviews.platforms[0], scale: "sur 5", reviewCountLabel: "43 avis voyageurs", verifiedLabel: "Données de l’annonce vérifiées le 3 août 2026", themes: ["Vue", "Piscine", "Espaces extérieurs", "Communication avec l’hôte"] },
-      { ...en.reviews.platforms[1], scale: "sur 10", reviewCountLabel: "12 avis voyageurs", verifiedLabel: "Données de l’annonce vérifiées le 3 août 2026", themes: ["Séjours en groupe", "Jardin", "Four en pierre", "Fidèle aux photos"] },
+      { ...en.reviews.platforms[0], scale: "sur 10", reviewCountLabel: "12 avis voyageurs", verifiedLabel: "Données de l’annonce vérifiées le 3 août 2026", themes: ["Séjours en groupe", "Jardin", "Four en pierre", "Fidèle aux photos"] },
     ],
     proofPoints: ["Une villa et une vue à la hauteur des photos", "Un cadre généreux pour familles et groupes", "La piscine et le jardin au cœur de chaque journée", "Des repas mémorables dehors et une communication attentive"],
     disclaimer: "Les notes et nombres d’avis sont des relevés datés des annonces officielles et peuvent évoluer.",

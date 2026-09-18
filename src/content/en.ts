@@ -19,7 +19,7 @@ export const en: SiteContent = {
     menuLabel: "Menu",
     closeLabel: "Close menu",
     skipLabel: "Skip to content",
-    bookLabel: "Check availability",
+    bookLabel: "Book & contact",
     languageLabel: "View in Italian",
     items: [
       { id: "experience", label: "The house", href: "#experience" },
@@ -32,20 +32,12 @@ export const en: SiteContent = {
   },
   platforms: [
     {
-      id: "airbnb",
-      name: "Airbnb",
-      url: "https://www.airbnb.it/rooms/23678485",
-      shortCta: "View on Airbnb",
-      availabilityCta: "Check availability on Airbnb",
-      externalLabel: "Opens the official Villa dei Limoni listing on Airbnb in a new tab",
-    },
-    {
       id: "vrbo",
       name: "Vrbo",
       url: "https://www.vrbo.com/it-it/affitto-vacanze/p8718530",
-      shortCta: "View on Vrbo",
-      availabilityCta: "Check availability on Vrbo",
-      externalLabel: "Opens the official Villa dei Limoni listing on Vrbo in a new tab",
+      shortCta: "Read reviews on Vrbo",
+      availabilityCta: "Read reviews on Vrbo",
+      externalLabel: "Opens Villa dei Limoni guest reviews on Vrbo in a new tab",
     },
   ],
   hero: {
@@ -293,17 +285,6 @@ export const en: SiteContent = {
       "Guest reviews on the official listings repeatedly mention the view, garden, pool, group layout and host communication.",
     platforms: [
       {
-        id: "airbnb",
-        name: "Airbnb",
-        score: "4.86",
-        scale: "out of 5",
-        reviewCount: 43,
-        reviewCountLabel: "43 guest reviews",
-        verifiedAt: "2026-08-03",
-        verifiedLabel: "Listing snapshot verified 3 August 2026",
-        themes: ["Views", "Pool", "Outdoor spaces", "Host communication"],
-      },
-      {
         id: "vrbo",
         name: "Vrbo",
         score: "9.8",
@@ -328,19 +309,19 @@ export const en: SiteContent = {
     eyebrow: "Rates & booking",
     title: "Plan a week above Camogli.",
     lead:
-      "Availability, live pricing, final taxes and cancellation terms are confirmed on the villa’s official Airbnb and Vrbo listings.",
+      "For availability, a tailored quote and booking conditions, contact Villa dei Limoni directly.",
     rateLabel: "Rates",
     rateValue: "Seasonal weekly rates available",
     rateDetail:
-      "Choose Villa Only or Villa + Pool Cottage on the booking platform to see the total for your dates and group.",
+      "Write to us with your dates and group size to receive a tailored proposal.",
     weeklyLabel: "Stay rhythm",
     weeklyDetail:
-      "The Airbnb listing currently presents seven-night stays from a Sunday start date; the live platform confirms the rule for each season.",
+      "The length and timing of the stay are confirmed directly in your proposal.",
     taxLabel: "Tourist tax",
     taxDetail:
-      "Tourist tax may apply under current Camogli municipal rules and is confirmed on the booking platform at the time of reservation.",
+      "The tourist tax is the only cost not included and is paid locally on arrival.",
     platformNote:
-      "Villa dei Limoni does not take payments on this website. Complete every reservation and payment on Airbnb or Vrbo.",
+      "Reservations are confirmed directly with the owners through a rental agreement and bank transfer.",
   },
   faq: {
     eyebrow: "Good to know",

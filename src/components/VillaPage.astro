@@ -6,7 +6,7 @@ import Gallery, { type GalleryImage } from "./Gallery.astro";
 import SiteFooter from "./SiteFooter.astro";
 import { getSiteContent, localeHref, locales } from "../content";
 import { mediaAlt, mediaAssets, mediaById } from "../content/media";
-import { bookingPlatforms, canonicalFacts, propertyIdentity } from "../data/property-facts";
+import { canonicalFacts, propertyIdentity } from "../data/property-facts";
 import type { Locale } from "../types";
 
 interface Props {
@@ -15,7 +15,7 @@ interface Props {
 
 const { locale } = Astro.props;
 const content = getSiteContent(locale);
-const ratesHref = `${localeHref(locale, import.meta.env.BASE_URL)}rates/`;
+const contactHref = `${localeHref(locale, import.meta.env.BASE_URL)}contact/`;
 const base = import.meta.env.BASE_URL;
 const mediaPath = (src: string) => `${base}${src.replace(/^\//, "")}`;
 const asset = (id: keyof typeof mediaById) => mediaById[id];
@@ -97,6 +97,13 @@ const rentalData = {
   },
   availableLanguage: locales,
   currenciesAccepted: "EUR",
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "reservations",
+    email: propertyIdentity.email,
+    telephone: propertyIdentity.telephone,
+    availableLanguage: locales,
+  },
   checkoutTime: canonicalFacts.stay.checkout,
   petsAllowed: canonicalFacts.policies.petsAllowed,
   numberOfRooms: {
@@ -113,7 +120,7 @@ const rentalData = {
     { "@type": "LocationFeatureSpecification", name: "Sea view", value: true },
     { "@type": "LocationFeatureSpecification", name: "Private garage", value: true },
   ],
-  sameAs: [bookingPlatforms.airbnb, bookingPlatforms.vrbo],
+  sameAs: ["https://www.vrbo.com/it-it/affitto-vacanze/p8718530"],
 };
 const structuredData = {
   "@context": "https://schema.org",
@@ -156,19 +163,7 @@ const structuredData = {
           <p class="eyebrow eyebrow--light hero__eyebrow">{content.hero.eyebrow}</p>
           <h1 class="display" id="hero-title">{content.hero.title}</h1>
           <p class="hero__description">{content.hero.description}</p>
-          <div class="hero__actions">
-            {content.platforms.map((platform) => (
-              <a
-                class="button button--light"
-                href={platform.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={platform.externalLabel}
-              >
-                {platform.shortCta}<span aria-hidden="true">↗</span>
-              </a>
-            ))}
-          </div>
+          <div class="hero__actions"><a class="button button--light" href={contactHref}>{{ en: "Book & contact us", it: "Prenota e contattaci", fr: "Réserver & nous contacter", es: "Reservar y contactarnos" }[locale]}</a></div>
         </div>
         <a class="hero__scroll" href="#experience">
           <span>{content.hero.scrollLabel}</span>
@@ -243,7 +238,7 @@ const structuredData = {
                   </dl>
                   <ul>{mode.features.map((feature) => <li>{feature}</li>)}</ul>
                   <p class="stay-mode__note">{mode.note}</p>
-                  <a class="text-link stay-mode__cta" href={ratesHref}>{{ en: "See rates", it: "Vedi le tariffe", fr: "Voir les tarifs", es: "Ver tarifas" }[locale]}</a>
+                  <a class="text-link stay-mode__cta" href={contactHref}>{{ en: "Request dates and rates", it: "Richiedi date e tariffe", fr: "Demander les dates et tarifs", es: "Solicitar fechas y tarifas" }[locale]}</a>
                 </div>
               </article>
             );
@@ -378,7 +373,7 @@ const structuredData = {
           <p class="lead">{content.reviews.intro}</p>
         </header>
         <div class="review-scores">
-          {content.reviews.platforms.map((review) => (
+          {content.reviews.platforms.filter((review) => review.id === "vrbo").map((review) => (
             <article data-reveal data-motion>
               <div class="review-score"><strong>{review.score}</strong><span>{review.scale}</span></div>
               <h3>{review.name}</h3>
@@ -411,7 +406,7 @@ const structuredData = {
           <p class="body-copy">{content.faq.intro}</p>
         </header>
         <div class="faq-list">
-          {content.faq.items.map((item, index) => (
+          {content.faq.items.filter((item) => ["access", "parking", "children"].includes(item.id)).map((item, index) => (
             <details data-reveal data-motion open={index === 0}>
               <summary><span>{String(index + 1).padStart(2, "0")}</span>{item.question}<i aria-hidden="true"></i></summary>
               <div><p>{item.answer}</p></div>
@@ -429,79 +424,23 @@ const structuredData = {
       <div class="shell booking__content" data-motion>
         <p class="eyebrow eyebrow--light">{content.booking.eyebrow}</p>
         <h2 class="display">{content.booking.title}</h2>
-        <p class="booking__lead">{content.booking.lead}</p>
+        <p class="booking__lead">{{ en: "For availability, a tailored quote and booking conditions, contact us directly. We confirm reservations with a rental agreement and bank transfer.", it: "Per disponibilità, preventivo personalizzato e condizioni di prenotazione, contattaci direttamente. Confermiamo le prenotazioni con contratto di locazione e bonifico.", fr: "Pour les disponibilités, un devis sur mesure et les conditions de réservation, contactez-nous directement. Les réservations sont confirmées par contrat de location et virement bancaire.", es: "Para disponibilidad, presupuesto personalizado y condiciones de reserva, contáctanos directamente. Confirmamos las reservas mediante contrato de alquiler y transferencia bancaria." }[locale]}</p>
         <div class="booking__facts">
-          <div><span>{content.booking.rateLabel}</span><strong>{content.booking.rateValue}</strong><p>{content.booking.rateDetail}</p></div>
-          <div><span>{content.booking.weeklyLabel}</span><strong>7 {{ en: "nights", it: "notti", fr: "nuits", es: "noches" }[locale]}</strong><p>{content.booking.weeklyDetail}</p></div>
-          <div><span>{content.booking.taxLabel}</span><strong>{{ en: "Confirmed at reservation", it: "Confermata alla prenotazione", fr: "Confirmée à la réservation", es: "Confirmada al reservar" }[locale]}</strong><p>{content.booking.taxDetail}</p></div>
+          <div><span>{{ en: "Availability", it: "Disponibilità", fr: "Disponibilités", es: "Disponibilidad" }[locale]}</span><strong>{{ en: "On request", it: "Su richiesta", fr: "Sur demande", es: "A petición" }[locale]}</strong><p>{{ en: "We do not publish a public availability calendar.", it: "Non pubblichiamo un calendario pubblico delle disponibilità.", fr: "Nous ne publions pas de calendrier de disponibilité public.", es: "No publicamos un calendario público de disponibilidad." }[locale]}</p></div>
+          <div><span>{{ en: "How to book", it: "Come prenotare", fr: "Comment réserver", es: "Cómo reservar" }[locale]}</span><strong>{{ en: "Directly with us", it: "Direttamente con noi", fr: "Directement avec nous", es: "Directamente con nosotros" }[locale]}</strong><p>{{ en: "Email us to receive a proposal, rental agreement and bank-transfer instructions.", it: "Scrivici per ricevere proposta, contratto di locazione e istruzioni per il bonifico.", fr: "Écrivez-nous pour recevoir une proposition, le contrat de location et les instructions de virement.", es: "Escríbenos para recibir una propuesta, contrato de alquiler e instrucciones para la transferencia." }[locale]}</p></div>
+          <div><span>{{ en: "Tourist tax", it: "Tassa di soggiorno", fr: "Taxe de séjour", es: "Tasa turística" }[locale]}</span><strong>{{ en: "Paid on arrival", it: "Versata all’arrivo", fr: "Payée à l’arrivée", es: "Pagada a la llegada" }[locale]}</strong><p>{{ en: "The tourist tax is the only cost not included and is paid locally on arrival.", it: "La tassa di soggiorno è l’unico costo non incluso e si versa in loco all’arrivo.", fr: "La taxe de séjour est le seul coût non inclus et est payée sur place à l’arrivée.", es: "La tasa turística es el único coste no incluido y se paga localmente a la llegada." }[locale]}</p></div>
         </div>
         <div class="booking__actions">
-          {content.platforms.map((platform) => (
-            <a class="button button--light" href={platform.url} target="_blank" rel="noopener noreferrer" aria-label={platform.externalLabel}>
-              {platform.availabilityCta}<span aria-hidden="true">↗</span>
-            </a>
-          ))}
+          <a class="button button--light" href={contactHref}>{{ en: "Contact us", it: "Contattaci", fr: "Nous contacter", es: "Contáctanos" }[locale]}</a>
         </div>
-        <p class="booking__note">{content.booking.platformNote}</p>
+        <p class="booking__note"><a href={`mailto:${propertyIdentity.email}`}>{propertyIdentity.email}</a> · <a href={`tel:${propertyIdentity.telephone.replaceAll(" ", "")}`}>{propertyIdentity.telephone}</a></p>
       </div>
     </section>
   </main>
 
   <SiteFooter content={content} />
 
-  <div class="mobile-booking">
-    <button type="button" data-booking-toggle aria-expanded="false" aria-controls="booking-sheet">{content.navigation.bookLabel}</button>
-    <div class="booking-sheet" id="booking-sheet" data-booking-sheet role="dialog" aria-modal="true" aria-label={content.navigation.bookLabel} aria-hidden="true" inert>
-      <div>
-        <span>{content.booking.eyebrow}</span>
-        <button type="button" data-booking-close aria-label={content.navigation.closeLabel}>×</button>
-      </div>
-      {content.platforms.map((platform) => <a href={platform.url} target="_blank" rel="noopener noreferrer" aria-label={platform.externalLabel}>{platform.availabilityCta}<span>↗</span></a>)}
-    </div>
-  </div>
-
-  <script>
-    const bookingToggle = document.querySelector<HTMLButtonElement>("[data-booking-toggle]");
-    const bookingSheet = document.querySelector<HTMLElement>("[data-booking-sheet]");
-    const bookingClose = document.querySelector<HTMLButtonElement>("[data-booking-close]");
-    const setBookingSheet = (open: boolean) => {
-      bookingToggle?.setAttribute("aria-expanded", String(open));
-      bookingSheet?.setAttribute("aria-hidden", String(!open));
-      if (bookingSheet) bookingSheet.inert = !open;
-      document.body.dataset.bookingOpen = String(open);
-      if (open) {
-        window.dispatchEvent(new CustomEvent("villa:overlay", { detail: "booking" }));
-        bookingClose?.focus();
-      }
-      else bookingToggle?.focus();
-    };
-    bookingToggle?.addEventListener("click", () => setBookingSheet(bookingToggle.getAttribute("aria-expanded") !== "true"));
-    bookingClose?.addEventListener("click", () => setBookingSheet(false));
-    document.addEventListener("keydown", (event) => {
-      if (bookingToggle?.getAttribute("aria-expanded") !== "true" || !bookingSheet) return;
-      if (event.key === "Escape") setBookingSheet(false);
-      if (event.key === "Tab") {
-        const focusable = Array.from(bookingSheet.querySelectorAll<HTMLElement>("button, a"));
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
-        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
-      }
-    });
-    document.addEventListener("pointerdown", (event) => {
-      if (bookingToggle?.getAttribute("aria-expanded") === "true" && !document.querySelector(".mobile-booking")?.contains(event.target as Node)) setBookingSheet(false);
-    });
-    window.addEventListener("villa:overlay", ((event: CustomEvent<string>) => {
-      if (event.detail !== "booking" && bookingToggle?.getAttribute("aria-expanded") === "true") setBookingSheet(false);
-    }) as EventListener);
-    const bookingSection = document.querySelector("#booking");
-    if (bookingSection) {
-      const observer = new IntersectionObserver(([entry]) => {
-        document.body.dataset.bookingSectionVisible = String(entry.isIntersecting);
-      }, { threshold: 0.08 });
-      observer.observe(bookingSection);
-    }
-  </script>
+  <a class="mobile-booking" href={contactHref}>{{ en: "Book & contact us", it: "Prenota e contattaci", fr: "Réserver & nous contacter", es: "Reservar y contactarnos" }[locale]}</a>
 </BaseLayout>
 
 <style>
@@ -773,12 +712,7 @@ const structuredData = {
     .footer__links a { justify-content: flex-start; }
     .footer__bottom { gap: .7rem; }
     .mobile-booking { position: fixed; z-index: 85; right: .75rem; bottom: max(.75rem, env(safe-area-inset-bottom)); left: .75rem; display: block; transition: opacity 250ms ease, transform 250ms ease; }
-    .mobile-booking > button { width: 100%; min-height: 3.5rem; border: 1px solid var(--paper); background: var(--ink); color: var(--paper); font-size: .68rem; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; box-shadow: 0 8px 30px rgb(0 0 0 / 22%); }
-    .booking-sheet { position: absolute; right: 0; bottom: calc(100% + .55rem); left: 0; display: grid; max-height: calc(100svh - 6rem); gap: .6rem; padding: 1rem; overflow-y: auto; background: var(--paper); color: var(--ink); box-shadow: 0 -10px 50px rgb(0 0 0 / 22%); opacity: 0; pointer-events: none; visibility: hidden; transform: translateY(1rem); transition: opacity 350ms var(--ease), transform 350ms var(--ease), visibility 0s linear 350ms; }
-    .booking-sheet[aria-hidden="false"] { opacity: 1; pointer-events: auto; visibility: visible; transform: none; transition-delay: 0s; }
-    .booking-sheet > div { display: flex; min-height: 44px; align-items: center; justify-content: space-between; color: var(--terracotta); font-size: .62rem; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; }
-    .booking-sheet button { width: 44px; height: 44px; border: 0; background: transparent; color: var(--ink); font-size: 1.5rem; }
-    .booking-sheet > a { display: flex; min-height: 3.3rem; align-items: center; justify-content: space-between; padding: .8rem 1rem; border: 1px solid var(--ink); font-size: .65rem; font-weight: 650; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; }
+    .mobile-booking { width: auto; min-height: 3.5rem; align-items: center; justify-content: center; border: 1px solid var(--paper); background: var(--ink); color: var(--paper); font-size: .68rem; font-weight: 650; letter-spacing: .12em; text-align: center; text-decoration: none; text-transform: uppercase; box-shadow: 0 8px 30px rgb(0 0 0 / 22%); }
     :global(body[data-menu-open="true"]) .mobile-booking,
     :global(body[data-modal-open="true"]) .mobile-booking,
     :global(body[data-booking-section-visible="true"]) .mobile-booking { opacity: 0; pointer-events: none; transform: translateY(1rem); }

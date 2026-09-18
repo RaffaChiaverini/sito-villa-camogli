@@ -1,6 +1,5 @@
 import { amenityGroups, amenityStatusLabels } from "../data/amenities";
 import { pendingOwnerApprovals, propertyIdentity } from "../data/property-facts";
-import { ratePolicy } from "../data/rates";
 import type { Locale } from "../types";
 import { getSiteContent } from ".";
 
@@ -10,7 +9,6 @@ export const pageSlugs = [
   "rooms-floorplans",
   "amenities",
   "rates",
-  "availability",
   "location",
   "experiences",
   "reviews",
@@ -51,25 +49,28 @@ export interface DetailPageContent {
   heroImageId: string;
   sections: readonly DetailSection[];
   showGallery?: boolean;
-  showPlatforms?: boolean;
   updatedLabel?: string;
 }
 
-const tr = (locale: Locale, en: string, it: string) => (locale === "en" ? en : it);
+// Detailed editorial copy is currently authored in English and Italian. Until
+// dedicated French and Spanish copy is approved, English is the safer fallback
+// than showing Italian text on those routes.
+const tr = (locale: Locale, en: string, it: string) => (locale === "it" ? it : en);
 
 export const primaryPageNavigation = (locale: Locale) => [
-  { slug: "villa" as const, label: tr(locale, "Villa", "Villa") },
+  { slug: "villa" as const, label: tr(locale, "Property", "Proprietà") },
+  { slug: "location" as const, label: tr(locale, "Surroundings", "Dintorni") },
   { slug: "gallery" as const, label: tr(locale, "Gallery", "Galleria") },
+  { slug: "reviews" as const, label: tr(locale, "Reviews", "Recensioni") },
   { slug: "rates" as const, label: tr(locale, "Rates", "Tariffe") },
-  { slug: "location" as const, label: tr(locale, "Location", "Posizione") },
-  { slug: "experiences" as const, label: tr(locale, "Experiences", "Esperienze") },
+  { slug: "contact" as const, label: tr(locale, "Book & contact", "Prenota e contattaci") },
 ];
 
-const bookingNotice = (locale: Locale) =>
+const directBookingNotice = (locale: Locale) =>
   tr(
     locale,
-    "This website does not accept reservations or payments. Current dates, final pricing, taxes, cancellation terms and booking are handled by the official Airbnb and Vrbo listings.",
-    "Questo sito non accetta prenotazioni o pagamenti. Date aggiornate, prezzo finale, imposte, condizioni di cancellazione e prenotazione sono gestiti dagli annunci ufficiali Airbnb e Vrbo.",
+    "To check availability or arrange a direct reservation, email villadeilimonicamogli@gmail.com. Reservations are confirmed directly with the owners through a rental agreement and bank transfer; no public availability calendar is published.",
+    "Per conoscere la disponibilità o organizzare una prenotazione diretta, scriva a villadeilimonicamogli@gmail.com. Le prenotazioni vengono confermate direttamente con i proprietari tramite contratto di locazione e bonifico; non pubblichiamo un calendario delle disponibilità.",
   );
 
 export function getDetailPage(locale: Locale, slug: PageSlug): DetailPageContent {
@@ -77,7 +78,6 @@ export function getDetailPage(locale: Locale, slug: PageSlug): DetailPageContent
   const common = {
     slug,
     heroImageId: "hero-view",
-    showPlatforms: true,
   };
 
   if (slug === "villa") {
@@ -184,72 +184,43 @@ export function getDetailPage(locale: Locale, slug: PageSlug): DetailPageContent
   }
 
   if (slug === "rates") {
-    const cottageSupplement = ratePolicy.poolCottageSupplement;
-
     return {
       ...common,
       navLabel: tr(locale, "Rates", "Tariffe"),
       eyebrow: tr(locale, "Rates", "Tariffe"),
       title: tr(locale, "Seasonal rates for the villa.", "Tariffe stagionali della villa."),
-      intro: tr(locale, "A clear guide to the published rates and supplements. This page is for information only: it has no availability calendar, checkout or direct booking.", "Una guida chiara alle tariffe e ai supplementi pubblicati. Questa pagina è solo informativa: non contiene calendario delle disponibilità, checkout o prenotazione diretta."),
-      seoDescription: tr(locale, "Published weekly rates and supplements for Villa dei Limoni in Camogli.", "Tariffe settimanali e supplementi pubblicati per Villa dei Limoni a Camogli."),
+      intro: tr(locale, "A clear guide to rates and what is included. Ask us directly for dates, a tailored quote and the booking conditions; no public availability calendar is published.", "Una guida chiara alle tariffe e a ciò che è incluso. Ci contatti direttamente per date, preventivo e condizioni di prenotazione; non pubblichiamo un calendario delle disponibilità."),
+      seoDescription: tr(locale, "Direct booking rates, what is included and tourist-tax information for Villa dei Limoni in Camogli.", "Tariffe per la prenotazione diretta, cosa è incluso e informazioni sulla tassa di soggiorno per Villa dei Limoni a Camogli."),
       heroImageId: "outdoor-dining",
       sections: [
         {
           id: "rate-status",
           title: tr(locale, "Seasonal rates, clearly explained.", "Tariffe stagionali, spiegate con chiarezza."),
-          paragraphs: [tr(locale, "The main-villa price is dynamic and depends on selected dates. We only publish a price where the official listings state it clearly.", "Il prezzo della villa principale è dinamico e dipende dalle date selezionate. Pubblichiamo un importo solo quando gli annunci ufficiali lo indicano chiaramente.")],
+          paragraphs: [tr(locale, "Rates are confirmed directly according to dates, group size and the chosen villa configuration. Contact us for a tailored proposal.", "Le tariffe vengono confermate direttamente in base alle date, al numero di ospiti e alla configurazione scelta. Ci contatti per una proposta personalizzata.")],
           items: [
             {
-              title: tr(locale, "Pool cottage supplement", "Supplemento pool house"),
-              description: tr(
-                locale,
-                `€${cottageSupplement.minimumWeekly.toLocaleString("en-GB")}–€${cottageSupplement.maximumWeekly.toLocaleString("en-GB")} per week, plus €${cottageSupplement.cleaningAndLinen.toLocaleString("en-GB")} for cleaning and linen. It is available only with the main villa.`,
-                `€${cottageSupplement.minimumWeekly.toLocaleString("it-IT")}–€${cottageSupplement.maximumWeekly.toLocaleString("it-IT")} a settimana, più €${cottageSupplement.cleaningAndLinen.toLocaleString("it-IT")} per pulizia e biancheria. È disponibile solo insieme alla villa principale.`,
-              ),
-              meta: tr(locale, "Current listing range", "Intervallo attuale degli annunci"),
+              title: tr(locale, "Villa configuration", "Configurazione della villa"),
+              description: tr(locale, "The villa can be rented on its own or with the optional pool cottage. We will confirm the applicable rate with your quote.", "La villa può essere affittata da sola oppure con la pool house opzionale. Confermeremo la tariffa applicabile nel preventivo."),
+              meta: tr(locale, "On request", "Su richiesta"),
             },
-            { title: tr(locale, "Stay pattern", "Formula di soggiorno"), description: tr(locale, "The Airbnb listing currently presents seven-night stays with Sunday arrivals.", "L’annuncio Airbnb presenta attualmente soggiorni di sette notti con arrivo la domenica."), meta: tr(locale, "Verify the selected season online", "Verifica online la stagione scelta") },
-            { title: tr(locale, "Tourist tax", "Imposta di soggiorno"), description: tr(locale, ratePolicy.fees.touristTax.display, "Dovuta secondo le regole aggiornate del Comune di Camogli e confermata alla prenotazione."), meta: tr(locale, "Amount intentionally omitted", "Importo volutamente omesso") },
-            { title: tr(locale, "Final total", "Totale finale"), description: tr(locale, "Includes the platform’s current fees, taxes, terms and any promotion.", "Comprende costi, imposte, condizioni ed eventuali promozioni correnti della piattaforma."), meta: tr(locale, "Shown externally", "Mostrato esternamente") },
+            { title: tr(locale, "What is included", "Cosa è incluso"), description: tr(locale, "The agreed rental price includes the services stated in your quotation and rental agreement. The tourist tax is the only cost not included.", "Il prezzo di locazione concordato include i servizi indicati nel preventivo e nel contratto. L’unico costo non incluso è la tassa di soggiorno."), meta: tr(locale, "Please read your quote", "Faccia riferimento al preventivo") },
+            { title: tr(locale, "Tourist tax", "Tassa di soggiorno"), description: tr(locale, "The tourist tax is paid locally on arrival, in accordance with the current Comune di Camogli rules.", "La tassa di soggiorno viene versata in loco all’arrivo, secondo le regole vigenti del Comune di Camogli."), meta: tr(locale, "Not included", "Non inclusa") },
+            { title: tr(locale, "How to book", "Come prenotare"), description: tr(locale, "Write to us to check dates. We will send the proposal, rental agreement and bank-transfer instructions directly.", "Ci scriva per verificare le date. Le invieremo direttamente proposta, contratto di locazione e istruzioni per il bonifico."), meta: tr(locale, "Direct reservation", "Prenotazione diretta") },
           ],
-          notice: bookingNotice(locale),
+          notice: directBookingNotice(locale),
         },
       ],
     };
   }
 
-  if (slug === "availability") {
-    return {
-      ...common,
-      navLabel: tr(locale, "Availability", "Disponibilità"),
-      eyebrow: tr(locale, "Availability & booking", "Disponibilità e prenotazione"),
-      title: tr(locale, "Your stay begins on Airbnb or Vrbo.", "Il soggiorno inizia su Airbnb o Vrbo."),
-      intro: bookingNotice(locale),
-      seoDescription: tr(locale, "Check current Villa dei Limoni dates, pricing and booking terms on the official Airbnb or Vrbo listing.", "Verifica date, prezzi e condizioni di prenotazione di Villa dei Limoni sugli annunci ufficiali Airbnb o Vrbo."),
-      heroImageId: "finale-night",
-      sections: [
-        {
-          id: "how-it-works",
-          title: tr(locale, "Choose the platform you prefer.", "Scegli la piattaforma che preferisci."),
-          paragraphs: [tr(locale, "Both buttons open the villa’s official listing in a new tab. Review the configuration, dates, final total and cancellation terms there before confirming.", "Entrambi i pulsanti aprono l’annuncio ufficiale della villa in una nuova scheda. Prima di confermare, verifica lì configurazione, date, totale finale e condizioni di cancellazione.")],
-          items: [
-            { title: "Airbnb", description: tr(locale, "Current dates, messaging and Airbnb terms.", "Date aggiornate, messaggistica e condizioni Airbnb."), href: site.platforms[0].url, external: true },
-            { title: "Vrbo", description: tr(locale, "Current dates, messaging and Vrbo terms.", "Date aggiornate, messaggistica e condizioni Vrbo."), href: site.platforms[1].url, external: true },
-          ],
-          notice: tr(locale, "This site has no calendar, checkout, deposit or direct-booking flow.", "Questo sito non contiene calendario, checkout, deposito o prenotazione diretta."),
-        },
-      ],
-    };
-  }
 
   if (slug === "location") {
     return {
       ...common,
-      navLabel: tr(locale, "Location & access", "Posizione e accesso"),
-      eyebrow: site.location.eyebrow,
-      title: site.location.title,
-      intro: site.location.lead,
+      navLabel: tr(locale, "Surroundings", "Dintorni"),
+      eyebrow: tr(locale, "Camogli & surroundings", "Camogli e dintorni"),
+      title: tr(locale, "Explore Camogli, Portofino and the Ligurian coast.", "Scopri Camogli, Portofino e la Riviera."),
+      intro: tr(locale, "Ideas and practical starting points for planning time around Villa dei Limoni.", "Idee e informazioni pratiche per organizzare il tempo nei dintorni di Villa dei Limoni."),
       seoDescription: tr(locale, "Villa dei Limoni is above Camogli, near Portofino Natural Park, with a final pedestrian approach and two private garages.", "Villa dei Limoni si trova sopra Camogli, vicino al Parco di Portofino, con un tratto finale pedonale e due garage privati."),
       heroImageId: "camogli-destination",
       sections: [
@@ -283,10 +254,10 @@ export function getDetailPage(locale: Locale, slug: PageSlug): DetailPageContent
       eyebrow: site.reviews.eyebrow,
       title: site.reviews.title,
       intro: site.reviews.intro,
-      seoDescription: tr(locale, "Dated Airbnb and Vrbo rating snapshots and recurring guest themes for Villa dei Limoni.", "Valutazioni Airbnb e Vrbo datate e temi ricorrenti nelle recensioni di Villa dei Limoni."),
+      seoDescription: tr(locale, "Vrbo guest reviews and recurring guest themes for Villa dei Limoni in Camogli.", "Recensioni degli ospiti su Vrbo e temi ricorrenti per Villa dei Limoni a Camogli."),
       heroImageId: "outdoor-pool-wide",
       sections: [
-        { id: "platform-ratings", title: tr(locale, "Ratings stay separate and attributed.", "Le valutazioni restano separate e attribuite."), items: site.reviews.platforms.map((review) => ({ title: review.name, description: `${review.score} ${review.scale} · ${review.reviewCountLabel}`, meta: review.verifiedLabel, href: site.platforms.find((platform) => platform.id === review.id)!.url, external: true })), notice: site.reviews.disclaimer },
+        { id: "platform-ratings", title: tr(locale, "Independent guest feedback on Vrbo.", "Le recensioni degli ospiti su Vrbo."), items: site.reviews.platforms.filter((review) => review.id === "vrbo").map((review) => ({ title: review.name, description: `${review.score} ${review.scale} · ${review.reviewCountLabel}`, meta: review.verifiedLabel, href: site.platforms.find((platform) => platform.id === review.id)!.url, external: true })), notice: site.reviews.disclaimer },
         { id: "themes", title: tr(locale, "What guests mention repeatedly.", "Cosa ricordano spesso gli ospiti."), items: site.reviews.proofPoints.map((point) => ({ title: point, description: "" })) },
       ],
     };
@@ -295,26 +266,41 @@ export function getDetailPage(locale: Locale, slug: PageSlug): DetailPageContent
   if (slug === "policies") {
     return {
       ...common,
-      navLabel: tr(locale, "Policies & FAQ", "Regole e FAQ"),
+      navLabel: tr(locale, "Booking conditions & FAQ", "Condizioni di prenotazione"),
       eyebrow: site.faq.eyebrow,
       title: site.faq.title,
-      intro: site.faq.intro,
+      intro: tr(locale, "Clear practical information and the key conditions to know before requesting a direct reservation.", "Informazioni pratiche chiare e le principali condizioni da conoscere prima di richiedere una prenotazione diretta."),
       seoDescription: tr(locale, "Access, safety, arrival, pool, children, pets, events, services, tax and booking answers for Villa dei Limoni.", "Risposte su accesso, sicurezza, arrivo, piscina, bambini, animali, eventi, servizi, imposte e prenotazione di Villa dei Limoni."),
       heroImageId: "access-creuza",
-      sections: [{ id: "frequently-asked", title: tr(locale, "Before you confirm a stay.", "Prima di confermare il soggiorno."), items: site.faq.items.map((item) => ({ title: item.question, description: item.answer })), notice: tr(locale, "The terms attached to the confirmed platform reservation prevail.", "Fanno fede le condizioni associate alla prenotazione confermata sulla piattaforma.") }],
+      sections: [
+        {
+          id: "direct-booking",
+          title: tr(locale, "How direct booking works.", "Come funziona la prenotazione diretta."),
+          paragraphs: [directBookingNotice(locale)],
+          items: [
+            { title: tr(locale, "1. Ask about dates", "1. Chiedi le date"), description: tr(locale, "Email or call us with your preferred dates, group size and villa configuration.", "Scrivici o chiamaci indicando date desiderate, numero di ospiti e configurazione della villa.") },
+            { title: tr(locale, "2. Receive the proposal", "2. Ricevi la proposta"), description: tr(locale, "We will confirm availability and send the applicable rate, what is included and the rental conditions.", "Confermeremo la disponibilità e invieremo tariffa applicabile, cosa è incluso e condizioni di locazione.") },
+            { title: tr(locale, "3. Confirm directly", "3. Conferma direttamente"), description: tr(locale, "The reservation is completed with the rental agreement and bank transfer. The tourist tax is paid locally on arrival.", "La prenotazione viene conclusa con contratto di locazione e bonifico. La tassa di soggiorno si versa in loco all’arrivo.") },
+          ],
+        },
+        { id: "frequently-asked", title: tr(locale, "Important practical information.", "Informazioni pratiche importanti."), items: site.faq.items.filter((item) => ["access", "parking", "children"].includes(item.id)).map((item) => ({ title: item.question, description: item.answer })), notice: tr(locale, "The final rental agreement sets out the terms applicable to your stay.", "Il contratto di locazione definitivo riporta le condizioni applicabili al soggiorno.") },
+      ],
     };
   }
 
   if (slug === "contact") {
     return {
       ...common,
-      navLabel: tr(locale, "Contact", "Contatti"),
-      eyebrow: tr(locale, "Questions", "Domande"),
-      title: tr(locale, "Ask through the official listing.", "Scrivi tramite l’annuncio ufficiale."),
-      intro: tr(locale, "Until a dedicated business mailbox and privacy-reviewed form processor are approved, questions should be sent through Airbnb or Vrbo.", "Finché non saranno approvati una casella aziendale dedicata e un servizio form verificato sotto il profilo privacy, le domande devono essere inviate tramite Airbnb o Vrbo."),
-      seoDescription: tr(locale, "Contact Villa dei Limoni through its official Airbnb or Vrbo listing for property and booking questions.", "Contatta Villa dei Limoni tramite l’annuncio ufficiale Airbnb o Vrbo per domande sulla proprietà e sulla prenotazione."),
+      navLabel: tr(locale, "Book & contact", "Prenota e contattaci"),
+      eyebrow: tr(locale, "Direct reservations", "Prenotazioni dirette"),
+      title: tr(locale, "Plan your stay directly with us.", "Organizza il tuo soggiorno direttamente con noi."),
+      intro: tr(locale, "Write or call us to check dates, receive a proposal and arrange your direct reservation.", "Ci scriva o ci chiami per verificare le date, ricevere una proposta e organizzare la prenotazione diretta."),
+      seoDescription: tr(locale, "Contact Villa dei Limoni in Camogli for direct reservations, availability and tailored quotes.", "Contatta Villa dei Limoni a Camogli per prenotazioni dirette, disponibilità e preventivi personalizzati."),
       heroImageId: "story-citrus",
-      sections: [{ id: "contact-options", title: tr(locale, "Keep your question with your booking context.", "Mantieni la domanda nel contesto della prenotazione."), paragraphs: [bookingNotice(locale)], items: site.platforms.map((platform) => ({ title: platform.name, description: platform.externalLabel, href: platform.url, external: true })), notice: tr(locale, "Sending a message does not reserve dates.", "L’invio di un messaggio non riserva alcuna data.") }],
+      sections: [{ id: "contact-options", title: tr(locale, "Get in touch.", "Scrivici."), paragraphs: [directBookingNotice(locale)], items: [
+        { title: tr(locale, "Email", "Email"), description: propertyIdentity.email, href: `mailto:${propertyIdentity.email}` },
+        { title: tr(locale, "Telephone", "Telefono"), description: propertyIdentity.telephone, href: `tel:${propertyIdentity.telephone.replaceAll(" ", "")}` },
+      ], notice: tr(locale, "Sending a message does not reserve dates; we will confirm availability and next steps by email.", "L’invio di un messaggio non blocca le date; confermeremo disponibilità e passaggi successivi via email.") }],
     };
   }
 
@@ -323,10 +309,10 @@ export function getDetailPage(locale: Locale, slug: PageSlug): DetailPageContent
       navLabel: tr(locale, "Privacy", "Privacy"),
       eyebrow: tr(locale, "Privacy", "Privacy"),
       title: tr(locale, "A minimal-data showcase.", "Una vetrina con raccolta dati minima."),
-      intro: tr(locale, "This prototype does not use analytics, advertising trackers, embedded maps or a contact form.", "Questo prototipo non usa analytics, tracker pubblicitari, mappe incorporate o moduli di contatto."),
+      intro: tr(locale, "This website does not use analytics, advertising trackers, embedded maps or third-party booking widgets.", "Questo sito non usa analytics, tracker pubblicitari, mappe incorporate o widget di prenotazione di terze parti."),
       sections: [
         { id: "data", title: tr(locale, "What this site processes.", "Cosa tratta questo sito."), paragraphs: [tr(locale, "The static pages can be viewed without creating an account or submitting personal details. The hosting provider may process standard technical request logs under its own terms.", "Le pagine statiche possono essere consultate senza creare un account o fornire dati personali. Il fornitore di hosting può trattare log tecnici standard secondo le proprie condizioni.") ] },
-        { id: "external", title: tr(locale, "External booking platforms.", "Piattaforme di prenotazione esterne."), paragraphs: [tr(locale, "Following an Airbnb or Vrbo link leaves this website. The selected platform’s privacy notice and terms then apply.", "Seguendo un link Airbnb o Vrbo si lascia questo sito. Si applicano quindi informativa privacy e condizioni della piattaforma scelta.")], notice: tr(locale, "Qualified Italian legal review is required before publication.", "Prima della pubblicazione è necessaria una revisione legale qualificata in Italia.") },
+        { id: "contact", title: tr(locale, "Contact requests.", "Richieste di contatto."), paragraphs: [tr(locale, "Messages sent through the contact form open the visitor’s own email program and are not stored by this website. Email correspondence is processed only to respond to the request and manage any booking.", "I messaggi inviati tramite il modulo di contatto aprono il programma email del visitatore e non vengono memorizzati dal sito. La corrispondenza email è trattata solo per rispondere alla richiesta e gestire un’eventuale prenotazione.")], notice: tr(locale, "Qualified Italian legal review is required before publication.", "Prima della pubblicazione è necessaria una revisione legale qualificata in Italia.") },
       ],
     },
     cookies: {
@@ -341,7 +327,7 @@ export function getDetailPage(locale: Locale, slug: PageSlug): DetailPageContent
       intro: tr(locale, "The site uses semantic landmarks, keyboard-operable navigation and gallery controls, visible focus, responsive layouts and reduced-motion support.", "Il sito usa landmark semantici, navigazione e galleria da tastiera, focus visibile, layout responsivi e supporto alla riduzione del movimento."),
       sections: [
         { id: "features", title: tr(locale, "Current accessibility measures.", "Misure di accessibilità attuali."), items: [
-          { title: tr(locale, "Keyboard", "Tastiera"), description: tr(locale, "Menus, booking sheet and gallery support keyboard operation and Escape.", "Menu, pannello disponibilità e galleria funzionano da tastiera e con Esc.") },
+          { title: tr(locale, "Keyboard", "Tastiera"), description: tr(locale, "Menus, contact form and gallery support keyboard operation.", "Menu, modulo di contatto e galleria funzionano da tastiera.") },
           { title: tr(locale, "Motion", "Movimento"), description: tr(locale, "Non-essential motion is removed when reduced motion is requested.", "Il movimento non essenziale viene rimosso quando è richiesta la riduzione del movimento.") },
           { title: tr(locale, "Property access", "Accesso alla proprietà"), description: tr(locale, "The physical pedestrian path, stairs and terraced grounds are described separately from website accessibility.", "Il percorso pedonale fisico, le scale e il giardino terrazzato sono descritti separatamente dall’accessibilità del sito.") },
         ] },
@@ -357,7 +343,7 @@ export function getDetailPage(locale: Locale, slug: PageSlug): DetailPageContent
           { title: "CIN", description: propertyIdentity.cin },
           { title: "CITRA", description: propertyIdentity.citra },
         ] },
-        { id: "booking", title: tr(locale, "Booking responsibility.", "Responsabilità della prenotazione."), paragraphs: [bookingNotice(locale)], notice: tr(locale, "Final legal wording and operator details require owner and qualified-advisor approval before publication.", "Il testo legale finale e i dati del gestore richiedono l’approvazione del proprietario e di un consulente qualificato prima della pubblicazione.") },
+        { id: "booking", title: tr(locale, "Direct booking.", "Prenotazione diretta."), paragraphs: [directBookingNotice(locale)], notice: tr(locale, "Final legal wording and operator details require owner and qualified-advisor approval before publication.", "Il testo legale finale e i dati del gestore richiedono l’approvazione del proprietario e di un consulente qualificato prima della pubblicazione.") },
       ],
     },
   } as const;
@@ -368,7 +354,6 @@ export function getDetailPage(locale: Locale, slug: PageSlug): DetailPageContent
     ...legal,
     seoDescription: legal.intro,
     heroImageId: slug === "accessibility" ? "interior-dining" : "story-garden",
-    showPlatforms: slug === "legal",
     updatedLabel: tr(locale, "Prototype statement · 3 August 2026", "Dichiarazione del prototipo · 3 agosto 2026"),
   } as DetailPageContent;
 }

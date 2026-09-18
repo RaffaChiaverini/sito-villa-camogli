@@ -19,7 +19,7 @@ export const it: SiteContent = {
     menuLabel: "Menu",
     closeLabel: "Chiudi il menu",
     skipLabel: "Vai al contenuto",
-    bookLabel: "Verifica disponibilità",
+    bookLabel: "Prenota e contattaci",
     languageLabel: "View in English",
     items: [
       { id: "experience", label: "La casa", href: "#experience" },
@@ -32,20 +32,12 @@ export const it: SiteContent = {
   },
   platforms: [
     {
-      id: "airbnb",
-      name: "Airbnb",
-      url: "https://www.airbnb.it/rooms/23678485",
-      shortCta: "Scopri su Airbnb",
-      availabilityCta: "Verifica disponibilità su Airbnb",
-      externalLabel: "Apre l’annuncio ufficiale di Villa dei Limoni su Airbnb in una nuova scheda",
-    },
-    {
       id: "vrbo",
       name: "Vrbo",
       url: "https://www.vrbo.com/it-it/affitto-vacanze/p8718530",
-      shortCta: "Scopri su Vrbo",
-      availabilityCta: "Verifica disponibilità su Vrbo",
-      externalLabel: "Apre l’annuncio ufficiale di Villa dei Limoni su Vrbo in una nuova scheda",
+      shortCta: "Leggi le recensioni su Vrbo",
+      availabilityCta: "Leggi le recensioni su Vrbo",
+      externalLabel: "Apre le recensioni degli ospiti di Villa dei Limoni su Vrbo in una nuova scheda",
     },
   ],
   hero: {
@@ -296,17 +288,6 @@ export const it: SiteContent = {
       "Le recensioni sugli annunci ufficiali citano ripetutamente la vista, il giardino, la piscina, la disposizione per i gruppi e la comunicazione dell’host.",
     platforms: [
       {
-        id: "airbnb",
-        name: "Airbnb",
-        score: "4,86",
-        scale: "su 5",
-        reviewCount: 43,
-        reviewCountLabel: "43 recensioni degli ospiti",
-        verifiedAt: "2026-08-03",
-        verifiedLabel: "Dati dell’annuncio verificati il 3 agosto 2026",
-        themes: ["Panorama", "Piscina", "Spazi esterni", "Comunicazione dell’host"],
-      },
-      {
         id: "vrbo",
         name: "Vrbo",
         score: "9,8",
@@ -331,19 +312,19 @@ export const it: SiteContent = {
     eyebrow: "Tariffe e prenotazioni",
     title: "Una settimana sopra Camogli.",
     lead:
-      "Disponibilità, prezzi aggiornati, imposte finali e condizioni di cancellazione sono confermati negli annunci ufficiali della villa su Airbnb e Vrbo.",
+      "Per disponibilità, preventivo personalizzato e condizioni di prenotazione, contatti direttamente Villa dei Limoni.",
     rateLabel: "Tariffe",
     rateValue: "Tariffe settimanali stagionali disponibili",
     rateDetail:
-      "Seleziona Solo Villa oppure Villa + Pool House sulla piattaforma per visualizzare il totale relativo alle date e al gruppo.",
+      "Ci scriva indicando le date e il numero di ospiti per ricevere una proposta personalizzata.",
     weeklyLabel: "Ritmo del soggiorno",
     weeklyDetail:
-      "L’annuncio Airbnb presenta attualmente soggiorni di sette notti con inizio la domenica; la piattaforma aggiornata conferma la regola per ogni stagione.",
+      "Durata e orari del soggiorno vengono confermati direttamente nella proposta.",
     taxLabel: "Imposta di soggiorno",
     taxDetail:
-      "L’imposta di soggiorno può essere dovuta secondo le norme vigenti del Comune di Camogli ed è confermata dalla piattaforma al momento della prenotazione.",
+      "La tassa di soggiorno è l’unico costo non incluso e si versa in loco all’arrivo.",
     platformNote:
-      "Villa dei Limoni non accetta pagamenti su questo sito. Completa ogni prenotazione e pagamento su Airbnb o Vrbo.",
+      "Le prenotazioni vengono confermate direttamente con i proprietari tramite contratto di locazione e bonifico.",
   },
   faq: {
     eyebrow: "Da sapere",

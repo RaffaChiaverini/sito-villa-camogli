@@ -1,6 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
-const AIRBNB_LISTING = 'https://www.airbnb.it/rooms/23678485';
 const VRBO_LISTING = 'https://www.vrbo.com/it-it/affitto-vacanze/p8718530';
 const SITE_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:4321/';
 
@@ -64,8 +63,9 @@ test.describe('localized homepage', () => {
       await expect(page.getByRole('heading', { level: 1 })).toContainText(locale.heading);
       await expect(page.locator('body')).toContainText(locale.content);
 
-      await assertExternalPlatformLink(page, 'Airbnb', AIRBNB_LISTING);
       await assertExternalPlatformLink(page, 'Vrbo', VRBO_LISTING);
+      await expect(page.getByRole('link', { name: /book|prenota/i }).first()).toHaveAttribute('href', /contact/);
+      await expect(page.locator(`a[href*="airbnb"]`)).toHaveCount(0);
     });
   }
 
@@ -79,16 +79,15 @@ test.describe('localized homepage', () => {
     expect(await english.count(), 'Italian page should expose an English alternate').toBeGreaterThan(0);
   });
 
-  test('in-page navigation anchors resolve to unique targets', async ({ page }) => {
+  test('primary navigation exposes the requested editorial pages', async ({ page }) => {
     await goto(page, '/');
-    const anchors = await page.locator('nav a[href*="#"]').evaluateAll((links) =>
-      links.map((link) => (link as HTMLAnchorElement).hash).filter(Boolean),
-    );
-
-    expect(anchors.length, 'Expected the long-form page navigation to expose section anchors').toBeGreaterThan(0);
-    for (const hash of new Set(anchors)) {
-      const target = byId(page, hash.slice(1));
-      await expect(target, `Navigation target ${hash} should exist exactly once`).toHaveCount(1);
+    for (const path of ['/villa/', '/location/', '/gallery/', '/reviews/', '/rates/', '/contact/']) {
+      const locator = path === '/villa/'
+        ? page.locator('.desktop-nav .nav-submenu summary').first()
+        : path === '/rates/'
+          ? page.locator('.desktop-nav .nav-submenu summary').last()
+          : page.locator(`.desktop-nav a[href="${path}"]`);
+      await expect(locator).toHaveCount(1);
     }
   });
 
@@ -252,25 +251,12 @@ test.describe('optional interaction contracts', () => {
     await page.keyboard.press('Escape');
   });
 
-  test('mobile booking sheet is contained and traps focus', async ({ page }) => {
+  test('mobile booking CTA leads to direct contact', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 568 });
-    const toggle = page.locator('[data-booking-toggle]');
-    await toggle.click();
-    const sheet = page.locator('[data-booking-sheet]');
-    await expect(sheet).toBeVisible();
-    await expect(sheet).not.toHaveAttribute('inert', '');
-    const bounds = await sheet.boundingBox();
-    expect(bounds).not.toBeNull();
-    expect(bounds!.x).toBeGreaterThanOrEqual(0);
-    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(320);
-    expect(bounds!.y).toBeGreaterThanOrEqual(0);
-    const lastLink = sheet.getByRole('link').last();
-    await lastLink.focus();
-    await page.keyboard.press('Tab');
-    await expect(page.locator('[data-booking-close]')).toBeFocused();
-    await page.keyboard.press('Escape');
-    await expect(sheet).toBeHidden();
-    await expect(toggle).toBeFocused();
+    const cta = page.locator('.mobile-booking');
+    await expect(cta).toBeVisible();
+    await expect(cta).toHaveAttribute('href', '/contact/');
+    await expect(page.locator('[data-booking-sheet]')).toHaveCount(0);
   });
 
   test('FAQ controls report expanded state and reveal associated answers', async ({ page }) => {

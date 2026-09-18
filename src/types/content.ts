@@ -11,7 +11,7 @@ export type SectionId =
   | "booking"
   | "faq";
 
-export type PlatformId = "airbnb" | "vrbo";
+export type PlatformId = "vrbo";
 export type StayModeId = "villa" | "villa-cottage";
 
 export interface SeoContent {

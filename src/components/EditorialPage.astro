@@ -3,7 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import { getDetailPage, type PageSlug } from "../content/detail-pages";
 import { getSiteContent, localeHref, locales } from "../content";
 import { mediaAlt, mediaAssets, mediaById } from "../content/media";
-import { bookingPlatforms, canonicalFacts, propertyIdentity } from "../data/property-facts";
+import { canonicalFacts, propertyIdentity } from "../data/property-facts";
 import type { Locale } from "../types";
 import Gallery, { type GalleryImage } from "./Gallery.astro";
 import Navigation from "./Navigation.astro";
@@ -75,6 +75,13 @@ const structuredData = {
       },
       availableLanguage: locales,
       currenciesAccepted: "EUR",
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "reservations",
+        email: propertyIdentity.email,
+        telephone: propertyIdentity.telephone,
+        availableLanguage: locales,
+      },
       checkoutTime: canonicalFacts.stay.checkout,
       petsAllowed: canonicalFacts.policies.petsAllowed,
       numberOfRooms: {
@@ -93,7 +100,7 @@ const structuredData = {
         { "@type": "LocationFeatureSpecification", name: "Two private garages", value: true },
         { "@type": "LocationFeatureSpecification", name: "Wi-Fi", value: true },
       ],
-      sameAs: [bookingPlatforms.airbnb, bookingPlatforms.vrbo],
+      sameAs: ["https://www.vrbo.com/it-it/affitto-vacanze/p8718530"],
     },
     {
       "@type": "WebPage",
@@ -109,7 +116,7 @@ const structuredData = {
       ? [{
           "@type": "FAQPage",
           "@id": `${Astro.url.href}#faq`,
-          mainEntity: content.faq.items.map((item) => ({
+          mainEntity: content.faq.items.filter((item) => ["access", "parking", "children"].includes(item.id)).map((item) => ({
             "@type": "Question",
             name: item.question,
             acceptedAnswer: { "@type": "Answer", text: item.answer },
@@ -196,22 +203,53 @@ const structuredData = {
       ))}
     </div>
 
-    {page.showPlatforms && (
-      <section class="detail-conversion surface-blue" aria-labelledby="conversion-title">
-        <div class="shell">
-          <p class="eyebrow eyebrow--light">{content.booking.eyebrow}</p>
-          <h2 id="conversion-title">{{ en: "See current dates on your preferred platform.", it: "Verifica le date sulla piattaforma che preferisci.", fr: "Consultez les dates disponibles sur la plateforme de votre choix.", es: "Consulta las fechas disponibles en tu plataforma preferida." }[locale]}</h2>
-          <p>{content.booking.platformNote}</p>
-          <div>
-            {content.platforms.map((platform) => <a class="button button--light" href={platform.url} target="_blank" rel="noopener noreferrer" aria-label={platform.externalLabel}>{platform.availabilityCta}<span aria-hidden="true">↗</span></a>)}
-          </div>
+    {slug === "contact" && (
+      <section class="section contact-form-section" aria-labelledby="contact-form-title">
+        <div class="shell contact-form-section__grid">
+          <header>
+            <p class="eyebrow">{{ en: "Direct enquiry", it: "Richiesta diretta", fr: "Demande directe", es: "Consulta directa" }[locale]}</p>
+            <h2 class="section-title" id="contact-form-title">{{ en: "Tell us about your stay.", it: "Raccontaci il tuo soggiorno.", fr: "Parlez-nous de votre séjour.", es: "Cuéntanos sobre tu estancia." }[locale]}</h2>
+          </header>
+          <form class="contact-form" action={`mailto:${propertyIdentity.email}`} method="get" data-contact-form novalidate>
+            <label>{{ en: "Name", it: "Nome", fr: "Nom", es: "Nombre" }[locale]}<input name="name" autocomplete="name" required /></label>
+            <label>Email<input name="email" type="email" autocomplete="email" required /></label>
+            <label>{{ en: "Telephone (optional)", it: "Telefono (facoltativo)", fr: "Téléphone (facultatif)", es: "Teléfono (opcional)" }[locale]}<input name="telephone" type="tel" autocomplete="tel" /></label>
+            <label>{{ en: "Preferred dates and number of guests", it: "Date desiderate e numero di ospiti", fr: "Dates souhaitées et nombre de voyageurs", es: "Fechas preferidas y número de huéspedes" }[locale]}<textarea name="message" rows="6" required></textarea></label>
+            <button class="button" type="submit">{{ en: "Prepare email", it: "Prepara l’email", fr: "Préparer l’e-mail", es: "Preparar el correo" }[locale]}</button>
+            <p>{{ en: "This prepares an email with your details. You will need to review it and press Send in your email application; it does not reserve dates.", it: "Il modulo prepara un’email con i tuoi dati. Dovrai controllarla e premere Invia nel programma email; non blocca le date.", fr: "Le formulaire prépare un e-mail avec vos informations. Vous devrez le vérifier puis cliquer sur Envoyer dans votre application e-mail ; il ne réserve pas les dates.", es: "El formulario prepara un correo con tus datos. Deberás revisarlo y pulsar Enviar en tu aplicación de correo; no reserva fechas." }[locale]}</p>
+          </form>
         </div>
       </section>
     )}
+
   </main>
 
   <SiteFooter content={content} />
   {slug !== "rates" && <a class="rates-tab" href={`${localeRoot}rates/`}>{{ en: "Rates", it: "Tariffe", fr: "Tarifs", es: "Tarifas" }[locale]}<span aria-hidden="true">↗</span></a>}
+  <script is:inline define:vars={{ email: propertyIdentity.email, locale }}>
+    const form = document.querySelector("[data-contact-form]");
+    const labels = {
+      en: { subject: "Villa dei Limoni — enquiry", name: "Name", email: "Email", telephone: "Telephone", message: "Preferred dates and guests" },
+      it: { subject: "Villa dei Limoni — richiesta di soggiorno", name: "Nome", email: "Email", telephone: "Telefono", message: "Date desiderate e ospiti" },
+      fr: { subject: "Villa dei Limoni — demande de séjour", name: "Nom", email: "E-mail", telephone: "Téléphone", message: "Dates souhaitées et voyageurs" },
+      es: { subject: "Villa dei Limoni — consulta de estancia", name: "Nombre", email: "Correo", telephone: "Teléfono", message: "Fechas preferidas y huéspedes" },
+    };
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      const fields = new FormData(form);
+      const copy = labels[locale] || labels.en;
+      const body = [
+        `${copy.name}: ${fields.get("name") ?? ""}`,
+        `${copy.email}: ${fields.get("email") ?? ""}`,
+        `${copy.telephone}: ${fields.get("telephone") ?? ""}`,
+        "",
+        `${copy.message}:`,
+        fields.get("message") ?? "",
+      ].join("\n");
+      window.location.href = `mailto:${email}?subject=${encodeURIComponent(copy.subject)}&body=${encodeURIComponent(body)}`;
+    });
+  </script>
 </BaseLayout>
 
 <style>
@@ -245,12 +283,21 @@ const structuredData = {
   .detail-notice p { max-width: 48rem; margin: .6rem 0 0; color: var(--ink-soft); }
   .detail-gallery__heading { display: grid; grid-template-columns: 1fr 2fr; margin-bottom: 3rem; }
   .detail-conversion { padding-block: clamp(5rem, 10vw, 10rem); }
+  .contact-form-section { background: var(--ivory); }
+  .contact-form-section__grid { display: grid; grid-template-columns: minmax(16rem, .8fr) minmax(0, 1.2fr); gap: clamp(3rem, 9vw, 9rem); }
+  .contact-form { display: grid; gap: 1.25rem; }
+  .contact-form label { display: grid; gap: .55rem; color: var(--ink); font-size: .67rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .contact-form input, .contact-form textarea { width: 100%; box-sizing: border-box; padding: .9rem 0; border: 0; border-bottom: 1px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink); font: inherit; font-size: 1rem; letter-spacing: 0; text-transform: none; }
+  .contact-form textarea { resize: vertical; }
+  .contact-form button { justify-self: start; margin-top: .75rem; }
+  .contact-form p { max-width: 38rem; margin: 0; color: var(--ink-soft); font-size: .78rem; line-height: 1.55; }
   .detail-conversion h2 { max-width: 13ch; margin: 0; font-family: var(--font-display); font-size: clamp(3rem, 6vw, 6.5rem); font-weight: 360; letter-spacing: -.04em; line-height: .95; }
   .detail-conversion p { max-width: 42rem; margin: 2rem 0; color: rgb(244 240 230 / 75%); }
   .detail-conversion > div > div { display: flex; flex-wrap: wrap; gap: .75rem; }
   .rates-tab { position: fixed; z-index: 70; right: 1rem; bottom: 1rem; display: inline-flex; min-height: 3.2rem; align-items: center; gap: .7rem; padding: .8rem 1.05rem; background: var(--terracotta); color: var(--paper); font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; box-shadow: 0 12px 35px rgb(23 35 31 / 24%); }
   @media (max-width: 58rem) {
     .detail-section__grid { grid-template-columns: 1fr; }
+    .contact-form-section__grid { grid-template-columns: 1fr; }
     .detail-section__grid > header { position: static; }
   }
   @media (max-width: 40rem) {

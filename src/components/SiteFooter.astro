@@ -10,7 +10,10 @@ interface Props {
 const { content } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const localeRoot = localeHref(content.locale, base);
-const route = (slug: string) => `${localeRoot}${slug}/`;
+const route = (slug: string) => {
+  const [path, fragment] = slug.split("#");
+  return `${localeRoot}${path.replace(/\/$/, "")}/${fragment ? `#${fragment}` : ""}`;
+};
 const legalLinks = {
   en: [
       ["Privacy", "privacy"],
@@ -29,19 +32,17 @@ const legalLinks = {
 }[content.locale];
 const siteLinks = {
   en: [
-      ["The villa", "villa"], ["Gallery", "gallery"], ["Rooms & floorplans", "rooms-floorplans"],
-      ["Amenities", "amenities"], ["Rates", "rates"],
-      ["Location", "location"], ["Experiences", "experiences"], ["Reviews", "reviews"],
-      ["Policies", "policies"], ["Contact", "contact"],
+      ["Property", "villa"], ["Spaces", "rooms-floorplans"], ["Amenities", "amenities"],
+      ["Surroundings", "location"], ["Gallery", "gallery"], ["Reviews", "reviews"],
+      ["Rates", "rates"], ["What is included", "rates/#rate-status"], ["Booking conditions", "policies"], ["Book & contact", "contact"],
     ],
   it: [
-      ["La villa", "villa"], ["Galleria", "gallery"], ["Camere e planimetrie", "rooms-floorplans"],
-      ["Dotazioni", "amenities"], ["Tariffe", "rates"],
-      ["Posizione", "location"], ["Esperienze", "experiences"], ["Recensioni", "reviews"],
-      ["Regole", "policies"], ["Contatti", "contact"],
+      ["Proprietà", "villa"], ["Spazi", "rooms-floorplans"], ["Dotazioni", "amenities"],
+      ["Dintorni", "location"], ["Galleria", "gallery"], ["Recensioni", "reviews"],
+      ["Tariffe", "rates"], ["Cosa è incluso", "rates/#rate-status"], ["Condizioni di prenotazione", "policies"], ["Prenota e contattaci", "contact"],
     ],
-  fr: [["La villa", "villa"], ["Galerie", "gallery"], ["Chambres et plans", "rooms-floorplans"], ["Équipements", "amenities"], ["Tarifs", "rates"], ["Situation", "location"], ["Expériences", "experiences"], ["Avis", "reviews"], ["Conditions", "policies"], ["Contact", "contact"]],
-  es: [["La villa", "villa"], ["Galería", "gallery"], ["Dormitorios y planos", "rooms-floorplans"], ["Servicios", "amenities"], ["Tarifas", "rates"], ["Ubicación", "location"], ["Experiencias", "experiences"], ["Opiniones", "reviews"], ["Normas", "policies"], ["Contacto", "contact"]],
+  fr: [["Propriété", "villa"], ["Espaces", "rooms-floorplans"], ["Équipements", "amenities"], ["Environs", "location"], ["Galerie", "gallery"], ["Avis", "reviews"], ["Tarifs", "rates"], ["Ce qui est inclus", "rates/#rate-status"], ["Conditions de réservation", "policies"], ["Réserver & contacter", "contact"]],
+  es: [["Propiedad", "villa"], ["Espacios", "rooms-floorplans"], ["Servicios", "amenities"], ["Alrededores", "location"], ["Galería", "gallery"], ["Opiniones", "reviews"], ["Tarifas", "rates"], ["Qué está incluido", "rates/#rate-status"], ["Condiciones de reserva", "policies"], ["Reservar y contactar", "contact"]],
 }[content.locale];
 const languageLinks = locales.map((locale) => ({ locale, name: localeNames[locale], href: localeHref(locale, base) }));
 const factsLabel = { en: "Property facts", it: "Dati della proprietà", fr: "Informations sur la propriété", es: "Datos de la propiedad" }[content.locale];
@@ -50,12 +51,12 @@ const factsLabel = { en: "Property facts", it: "Dati della proprietà", fr: "Inf
 <footer class="footer surface-ink">
   <div class="shell footer__top">
     <div class="footer__brand">
-      <svg viewBox="0 0 28 32" aria-hidden="true"><path d="M14.4 29.5c.2-11 2.8-20.2 11-27-1 12.6-4.5 22.2-11 27Z"/><path d="M13.5 29.5C12 20.5 8.3 14.7 1.7 11.2c1.2 8.3 5.4 14.8 11.8 18.3Z"/></svg>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15.3 10.1c5.8-.9 10.2 2.8 9.3 8.4-.8 5.2-5 8.6-9.3 9.3-4.3-.7-8.5-4.1-9.3-9.3-.9-5.6 3.5-9.3 9.3-8.4Z"/><path d="M15.5 10.1c.7-3.5 3.6-5.6 7.1-5.1-1.4 3.3-4 5.1-7.1 5.1Z"/><path d="M15.4 10.2 17 7.5"/></svg>
       <strong>{content.brandName}</strong><span>{content.footer.strapline}</span>
     </div>
     <div class="footer__links">
       {siteLinks.map(([label, slug]) => <a href={route(slug)}>{label}</a>)}
-      {content.platforms.map((platform) => <a href={platform.url} target="_blank" rel="noopener noreferrer" aria-label={platform.externalLabel}>{platform.name} ↗</a>)}
+      {content.platforms.filter((platform) => platform.id === "vrbo").map((platform) => <a href={platform.url} target="_blank" rel="noopener noreferrer" aria-label={platform.externalLabel}>{platform.name} · recensioni ↗</a>)}
       {languageLinks.map(({ locale, name, href }) => <a href={href} hreflang={locale} lang={locale} aria-current={locale === content.locale ? "page" : undefined} data-locale-choice={locale}>{name}</a>)}
     </div>
   </div>
@@ -65,7 +66,7 @@ const factsLabel = { en: "Property facts", it: "Dati della proprietà", fr: "Inf
       <a href={`${base}sitemap.xml`}>Sitemap</a>
       <a href={`${base}property-facts.json`}>{factsLabel}</a>
     </div>
-    <p><strong>CIN</strong> {propertyIdentity.cin} · <strong>CITRA</strong> {propertyIdentity.citra}</p>
+    <div class="footer__contacts"><a href={`mailto:${propertyIdentity.email}`}>{propertyIdentity.email}</a><a href={`tel:${propertyIdentity.telephone.replaceAll(" ", "")}`}>{propertyIdentity.telephone}</a><p><strong>CIN</strong> {propertyIdentity.cin} · <strong>CITRA</strong> {propertyIdentity.citra}</p></div>
   </div>
   <div class="shell footer__bottom">
     <span>{content.footer.location}</span>
@@ -78,14 +79,17 @@ const factsLabel = { en: "Property facts", it: "Dati della proprietà", fr: "Inf
   .footer { padding: 5rem 0 2rem; }
   .footer__top { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
   .footer__brand { display: grid; grid-template-columns: auto 1fr; column-gap: 1rem; align-items: center; }
-  .footer__brand svg { grid-row: 1 / 3; width: 2rem; fill: currentColor; }
+  .footer__brand svg { grid-row: 1 / 3; width: 2.35rem; }
+  .footer__brand svg path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.35; }
   .footer__brand strong { font-family: var(--font-display); font-size: 1.55rem; font-weight: 430; }
   .footer__brand span { color: rgb(244 240 230 / 64%); font-size: .72rem; }
   .footer__links { display: grid; grid-template-columns: repeat(3, minmax(7rem, 1fr)); gap: 0 1.5rem; }
   .footer a { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; font-size: .66rem; font-weight: 650; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; }
   .footer__legal { display: flex; justify-content: space-between; gap: 2rem; margin-top: 3.5rem; padding-block: 1.2rem; border-top: 1px solid rgb(244 240 230 / 14%); border-bottom: 1px solid rgb(244 240 230 / 14%); }
   .footer__legal > div { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; }
-  .footer__legal p { margin: .75rem 0; color: rgb(244 240 230 / 70%); font-size: .65rem; letter-spacing: .06em; text-align: right; }
+  .footer__contacts { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0 1rem; }
+  .footer__contacts a { min-height: 44px; }
+  .footer__contacts p { width: 100%; margin: 0; color: rgb(244 240 230 / 70%); font-size: .65rem; letter-spacing: .06em; text-align: right; }
   .footer__bottom { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 1.5rem; padding-top: 1.5rem; color: rgb(244 240 230 / 52%); font-size: .58rem; letter-spacing: .06em; line-height: 1.5; text-transform: uppercase; }
   .footer__bottom span:nth-child(2) { text-align: center; }
   .footer__bottom span:last-child { text-align: right; }
@@ -93,7 +97,8 @@ const factsLabel = { en: "Property facts", it: "Dati della proprietà", fr: "Inf
     .footer__top { grid-template-columns: 1fr; }
     .footer__links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .footer__legal { display: block; }
-    .footer__legal p { text-align: left; }
+    .footer__contacts { justify-content: flex-start; }
+    .footer__contacts p { text-align: left; }
     .footer__bottom { grid-template-columns: 1fr; }
     .footer__bottom span:nth-child(2), .footer__bottom span:last-child { text-align: left; }
   }

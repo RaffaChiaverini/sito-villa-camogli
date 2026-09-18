@@ -15,7 +15,7 @@ export const es: SiteContent = {
     socialDescription: "Una villa privada con vistas al mar sobre Camogli, jardín en terrazas, piscina y senderos del parque de Portofino muy cerca.",
   },
   navigation: {
-    menuLabel: "Menú", closeLabel: "Cerrar el menú", skipLabel: "Ir al contenido", bookLabel: "Ver disponibilidad", languageLabel: "Cambiar idioma",
+    menuLabel: "Menú", closeLabel: "Cerrar el menú", skipLabel: "Ir al contenido", bookLabel: "Reservar y contactar", languageLabel: "Cambiar idioma",
     items: [
       { id: "experience", label: "La casa", href: "#experience" },
       { id: "stays", label: "Estancias", href: "#stays" },
@@ -27,9 +27,9 @@ export const es: SiteContent = {
   },
   platforms: en.platforms.map((platform) => ({
     ...platform,
-    shortCta: `Ver en ${platform.name}`,
-    availabilityCta: `Ver disponibilidad en ${platform.name}`,
-    externalLabel: `Abre el anuncio oficial de Villa dei Limoni en ${platform.name} en una pestaña nueva`,
+    shortCta: `Ver opiniones en ${platform.name}`,
+    availabilityCta: `Ver opiniones en ${platform.name}`,
+    externalLabel: `Abre las opiniones de Villa dei Limoni en ${platform.name} en una pestaña nueva`,
   })),
   hero: {
     eyebrow: "Camogli · Liguria", title: "Una villa privada de Liguria sobre Camogli.",
@@ -93,8 +93,7 @@ export const es: SiteContent = {
   reviews: {
     eyebrow: "Opiniones de huéspedes", title: "Un lugar que se recuerda.", intro: "Las opiniones de los anuncios oficiales mencionan a menudo las vistas, el jardín, la piscina, la distribución para grupos y la comunicación con el anfitrión.",
     platforms: [
-      { ...en.reviews.platforms[0], scale: "sobre 5", reviewCountLabel: "43 opiniones de huéspedes", verifiedLabel: "Datos del anuncio verificados el 3 de agosto de 2026", themes: ["Vistas", "Piscina", "Espacios exteriores", "Comunicación con el anfitrión"] },
-      { ...en.reviews.platforms[1], scale: "sobre 10", reviewCountLabel: "12 opiniones de huéspedes", verifiedLabel: "Datos del anuncio verificados el 3 de agosto de 2026", themes: ["Estancias en grupo", "Jardín", "Horno de piedra", "Fiel a las fotos"] },
+      { ...en.reviews.platforms[0], scale: "sobre 10", reviewCountLabel: "12 opiniones de huéspedes", verifiedLabel: "Datos del anuncio verificados el 3 de agosto de 2026", themes: ["Estancias en grupo", "Jardín", "Horno de piedra", "Fiel a las fotos"] },
     ],
     proofPoints: ["Una villa y unas vistas a la altura de las fotos", "Un entorno generoso para familias y grupos grandes", "La piscina y el jardín como centro de cada día", "Comidas memorables al aire libre y comunicación atenta"],
     disclaimer: "Las puntuaciones y el número de opiniones son capturas fechadas de los anuncios oficiales y pueden cambiar.",

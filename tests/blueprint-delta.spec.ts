@@ -7,7 +7,6 @@ const coreSlugs = [
   "rooms-floorplans",
   "amenities",
   "rates",
-  "availability",
   "location",
   "experiences",
   "reviews",
@@ -38,13 +37,13 @@ test.describe("blueprint launch delta", () => {
     });
   }
 
-  test("rates and availability never imitate a checkout", async ({ page }) => {
-    for (const path of ["/rates/", "/availability/", "/it/rates/", "/it/availability/"]) {
+  test("rates direct guests to contact without a public calendar or checkout", async ({ page }) => {
+    for (const path of ["/rates/", "/it/rates/"]) {
       await goto(page, path);
       await expect(page.locator('input[type="date"], input[type="number"], input[type="email"], input[type="password"]')).toHaveCount(0);
       await expect(page.locator("form")).toHaveCount(0);
-      await expect(page.locator("body")).toContainText(/Airbnb/);
-      await expect(page.locator("body")).toContainText(/Vrbo/);
+      await expect(page.locator("body")).toContainText(/contact|contatt/i);
+      await expect(page.locator("body")).toContainText(/calendar|calendario/i);
     }
   });
 
@@ -67,7 +66,7 @@ test.describe("blueprint launch delta", () => {
     expect(data.identity.cin).toBe("IT010007C2DQK53S7U");
     expect(data.facts.mainVilla.guests).toBe(12);
     expect(data.facts.estate.guests).toBe(16);
-    expect(data.bookingPlatforms.airbnb).toContain("airbnb.it/rooms/23678485");
+    expect(data.contact.email).toBe("villadeilimonicamogli@gmail.com");
 
     const sitemap = await request.get(new URL("sitemap.xml", SITE_BASE_URL).toString());
     expect(sitemap.ok()).toBe(true);
