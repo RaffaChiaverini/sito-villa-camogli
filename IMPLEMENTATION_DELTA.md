@@ -27,10 +27,9 @@ Reviewed against `deep-research-report (1).md` supplied on 3 August 2026.
 - Added GitHub Actions quality checks and a manual deployment workflow that cannot pass until prototype images are owner-cleared.
 - Added browser coverage for the new bilingual routes, discovery endpoints, identifiers and no-direct-booking boundaries.
 
-## Deliberately not implemented without approval or source assets
+## Still deliberately not implemented without source assets or final approval
 
-- Seasonal prices, fees or price schema: the two listings conflict and owner approval is missing.
-- Universal check-in time, changeover rule, current tourist-tax amount, and precise pool dates.
+- Precise annual pool opening and closing dates beyond the confirmed May–October season.
 - Professional floorplan drawings or downloadable accessible PDF.
 - Direct contact form or public email address: no approved business mailbox, processor, retention policy or privacy owner exists.
 - Analytics, consent manager or experiments: no measurement ID, approved CMP or privacy configuration exists.
@@ -42,7 +41,7 @@ Reviewed against `deep-research-report (1).md` supplied on 3 August 2026.
 ## Release blockers
 
 1. Replace or explicitly clear every prototype image and update provenance.
-2. Approve the canonical owner-fact queue in `src/data/property-facts.ts`.
+2. Resolve the remaining canonical owner-fact queue in `src/data/property-facts.ts`.
 3. Supply verified floorplans or approve the HTML-only room inventory.
 4. Complete Italian legal/privacy review and provide operator/contact details.
 5. Decide the final domain and update `site`/`base` configuration.

@@ -1,27 +1,34 @@
 export const ratePolicy = {
   currency: "EUR",
-  lastVerified: "2026-09-05",
-  status: "owner_approval_required",
+  lastVerified: "2026-10-05",
+  status: "owner_confirmed",
   minimumStayCandidate: 7,
   changeoverDayCandidate: "Sunday",
-  seasons: [],
+  seasons: [
+    { label: "April", weekly: 3600 },
+    { label: "May", weekly: 4100 },
+    { label: "June", weekly: 4700 },
+    { label: "July", weekly: 5300 },
+    { label: "August", weekly: 5600 },
+    { label: "September", weeklyMinimum: 3900, weeklyMaximum: 4300 },
+    { label: "October", weekly: 3600 },
+    { label: "Easter", weekly: 3900 },
+  ],
   poolCottageSupplement: {
-    minimumWeekly: 750,
-    maximumWeekly: 1490,
-    cleaningAndLinen: 120,
-    // The two public listings do not show the same range: Airbnb currently
-    // states €780–€1,350; Vrbo states €750–€1,490. The published envelope
-    // preserves both figures without presenting either as a fixed rate.
-    status: "indicative_current_listing_range",
+    minimumWeekly: 990,
+    maximumWeekly: 1950,
+    cleaningAndLinen: 150,
+    status: "owner_confirmed",
   },
   fees: {
-    mainVillaCleaning: null,
-    cottageCleaning: null,
-    linen: null,
-    securityDeposit: null,
+    mainVillaCleaning: "included",
+    cottageCleaning: 150,
+    linen: "one set per guest per week included",
+    securityDeposit: 450,
     touristTax: {
-      amount: null,
-      display: "Payable according to current Comune di Camogli regulations and confirmed at reservation.",
+      amount: 3,
+      appliesTo: "guests over 15",
+      display: "€3 per guest over 15 per night, payable on arrival.",
     },
   },
 } as const;

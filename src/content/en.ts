@@ -32,6 +32,14 @@ export const en: SiteContent = {
   },
   platforms: [
     {
+      id: "airbnb",
+      name: "Airbnb",
+      url: "https://www.airbnb.it/rooms/23678485",
+      shortCta: "Read our reviews on Airbnb",
+      availabilityCta: "Read our reviews on Airbnb",
+      externalLabel: "Opens Villa dei Limoni guest reviews on Airbnb in a new tab",
+    },
+    {
       id: "vrbo",
       name: "Vrbo",
       url: "https://www.vrbo.com/it-it/affitto-vacanze/p8718530",
@@ -42,9 +50,9 @@ export const en: SiteContent = {
   ],
   hero: {
     eyebrow: "Camogli · Liguria",
-    title: "A private Ligurian villa above Camogli.",
+    title: "A villa suspended between garden and sea.",
     description:
-      "Sea views, a terraced garden, a private pool and Camogli about five minutes away by car or bus.",
+      "Welcome to a villa surrounded by greenery, with a private pool and views across Golfo Paradiso, just a few minutes from Camogli.",
     exploreLabel: "Explore the villa",
     scrollLabel: "Scroll to discover",
     imageAlt:
@@ -52,21 +60,22 @@ export const en: SiteContent = {
   },
   facts: factRail.en,
   story: {
-    eyebrow: "The experience",
-    title: "A three-level villa in a terraced Ligurian garden.",
+    eyebrow: "Villa dei Limoni",
+    title: "A nineteenth-century villa above Camogli.",
     lead:
-      "Villa dei Limoni sits in a garden of fruit trees and flowering plants above Camogli, with views across Golfo Paradiso.",
+      "Villa dei Limoni is a nineteenth-century house with a private garden and pool, available for weekly stays.",
     paragraphs: [
-      "The main villa is arranged over three levels, with shared living spaces on the ground floor and six air-conditioned bedrooms across the two upper floors.",
-      "Outside, the villa has a 40-square-metre sea-view pool, an outdoor dining area, a barbecue and a wood-burning oven.",
-      "A separate pool cottage, renovated in 2024, can be added for up to four guests and is offered only with the main villa.",
+      "The villa is arranged over three levels: shared rooms, kitchen and sitting room on the ground floor, then six air-conditioned bedrooms and four bathrooms across the two upper floors. It sleeps up to 12 guests.",
+      "For more space, add the pool cottage: a small independent house beside the pool, renovated in 2024, which sleeps up to four guests and is only rented with the villa.",
+      "Outside you will find a 40 m² sea-view pool, a large terraced garden with fruit trees and flowers, a shaded dining area, barbecue and wood-burning oven.",
+      "The villa is reached on foot along an approximately 80-metre path from the nearest road. Two private garages are available for our guests.",
     ],
     imageAlt:
       "A sunlit stone terrace at Villa dei Limoni framed by citrus trees and flowering plants",
   },
   stays: {
     eyebrow: "Ways to stay",
-    title: "One villa, two listed configurations.",
+    title: "One villa, two ways to stay.",
     intro:
       "Choose the six-bedroom villa for up to 12 guests, or add the independent pool cottage for a group of up to 16. The cottage is only offered with the main house and is never rented to other guests.",
     comparisonLabels: {
@@ -89,7 +98,7 @@ export const en: SiteContent = {
         features: [
           "Air conditioning in every bedroom",
           "Equipped kitchen, living room and dining room",
-          "Fast Wi-Fi measured at 82 Mbps",
+          "Fast Wi-Fi (82 Mbps)",
           "Private pool, garden, outdoor dining and two garages",
         ],
         note: "The displayed rate for up to 12 guests covers the main villa only.",
@@ -141,7 +150,7 @@ export const en: SiteContent = {
       { id: "bedrooms", label: "Bedrooms", description: "Six air-conditioned bedrooms in the main villa" },
       { id: "bathrooms", label: "Bathrooms", description: "Four shower rooms and a ground-floor WC" },
       { id: "cottage", label: "Pool cottage", description: "Bedroom, living room, two bathrooms and kitchen" },
-      { id: "arrival", label: "Arrival", description: "The approximately 70-metre stone footpath" },
+      { id: "arrival", label: "Arrival", description: "The stone path leading to the villa" },
       { id: "camogli", label: "Around Camogli", description: "Village, beach, marina and nearby park paths" },
     ],
   },
@@ -150,14 +159,14 @@ export const en: SiteContent = {
     title: "Space to come together. Space to retreat.",
     intro:
       "The main villa unfolds over three levels, separating social rooms from two generous sleeping floors. The optional cottage adds an independent place to stay at pool level.",
-    goodForLabel: "Listed configurations",
+    goodForLabel: "The two options",
     goodFor:
       "The main villa accommodates up to 12 guests; adding the pool cottage raises the listed capacity to 16.",
     optionalLabel: "Optional with the villa",
     floors: [
       {
         id: "ground",
-        name: "Garden level",
+        name: "Ground floor",
         kicker: "Living together",
         summary: "Living room, separate dining room, equipped kitchen and guest WC.",
         rooms: [
@@ -224,7 +233,7 @@ export const en: SiteContent = {
           "A dedicated outdoor dining area overlooking the garden, pool and Golfo Paradiso.",
       },
       {
-        title: "Fire & flavour",
+        title: "Barbecue and wood-burning oven",
         description:
           "A barbecue and wood-burning oven are provided in the outdoor area.",
       },
@@ -242,28 +251,23 @@ export const en: SiteContent = {
   },
   location: {
     eyebrow: "Camogli & beyond",
-    title: "Above Camogli, near Portofino Natural Park.",
+    title: "Camogli, Portofino Park and the Riviera.",
     lead:
-      "The villa is set in a quiet, green area above Camogli, close to Portofino Natural Park.",
+      "We are surrounded by greenery above Camogli, at the edge of Portofino Natural Park.",
     paragraphs: [
-      "Camogli is about five minutes away by car or bus, or 15–20 minutes on foot—downhill on the way there and uphill on the return.",
-      "Santa Margherita, Rapallo, Portofino and Genoa are within driving reach, while the Camogli–San Rocco–Batterie–San Fruttuoso trail begins nearby.",
+      "Camogli is 5–10 minutes away by car or bus, or about 20 minutes on foot—downhill on the way there and uphill on the return.",
+      "The path to San Rocco, Batterie and San Fruttuoso begins near the house and is one of Liguria’s most scenic walks. Santa Margherita, Rapallo, Portofino and Genoa are all within easy reach.",
     ],
     details: [
       {
-        value: "≈ 5 min",
+        value: "5–10 min",
         label: "Camogli by car or bus",
         description: "Traffic and season permitting",
       },
       {
-        value: "≈ 15–20 min",
+        value: "≈ 20 min",
         label: "Walk downhill to Camogli",
         description: "The return is uphill",
-      },
-      {
-        value: "≈ 80 km",
-        label: "Marked park trails",
-        description: "Across the Portofino park network",
       },
     ],
     highlightsTitle: "Close at hand",
@@ -275,24 +279,35 @@ export const en: SiteContent = {
     ],
     privacyNote:
       "For privacy, this website indicates upper Camogli only. Confirmed guests should follow the arrival directions supplied with their reservation.",
-    mapLabel: "Approximate location in upper Camogli",
+    mapLabel: "Indicative map of Camogli, Portofino and San Fruttuoso",
     imageAlt: "The colourful seafront and beach of Camogli seen from above",
   },
   reviews: {
-    eyebrow: "Guest impressions",
-    title: "A place guests remember.",
+    eyebrow: "Reviews",
+    title: "In the words of our guests.",
     intro:
-      "Guest reviews on the official listings repeatedly mention the view, garden, pool, group layout and host communication.",
+      "Our guests describe the experience better than we ever could. We have welcomed visitors through Airbnb and Vrbo since 2018.",
     platforms: [
+      {
+        id: "airbnb",
+        name: "Airbnb",
+        score: "4.87",
+        scale: "out of 5",
+        reviewCount: 45,
+        reviewCountLabel: "45 verified reviews",
+        verifiedAt: "2026-10-26",
+        verifiedLabel: "Checked 26 October 2026",
+        themes: ["Views", "Pool", "Outdoor spaces", "Hospitality"],
+      },
       {
         id: "vrbo",
         name: "Vrbo",
-        score: "9.8",
+        score: "9.6",
         scale: "out of 10",
-        reviewCount: 12,
-        reviewCountLabel: "12 guest reviews",
-        verifiedAt: "2026-08-03",
-        verifiedLabel: "Listing snapshot verified 3 August 2026",
+        reviewCount: 14,
+        reviewCountLabel: "14 verified reviews",
+        verifiedAt: "2026-10-26",
+        verifiedLabel: "Checked 26 October 2026",
         themes: ["Group stays", "Garden", "Stone oven", "As pictured"],
       },
     ],
@@ -309,97 +324,64 @@ export const en: SiteContent = {
     eyebrow: "Rates & booking",
     title: "Plan a week above Camogli.",
     lead:
-      "For availability, a tailored quote and booking conditions, contact Villa dei Limoni directly.",
+      "Write to us to check availability, receive a tailored quote and arrange a direct booking.",
     rateLabel: "Rates",
-    rateValue: "Seasonal weekly rates available",
+    rateValue: "Weekly rates from €3,600",
     rateDetail:
       "Write to us with your dates and group size to receive a tailored proposal.",
     weeklyLabel: "Stay rhythm",
     weeklyDetail:
-      "The length and timing of the stay are confirmed directly in your proposal.",
+      "The property is rented for at least seven nights, from Sunday to Sunday.",
     taxLabel: "Tourist tax",
     taxDetail:
-      "The tourist tax is the only cost not included and is paid locally on arrival.",
+      "Tourist tax is €3 per guest over 15, per night, and is paid on arrival.",
     platformNote:
       "Reservations are confirmed directly with the owners through a rental agreement and bank transfer.",
   },
   faq: {
     eyebrow: "Good to know",
-    title: "The practical details, clearly told.",
+    title: "A few more questions.",
     intro:
-      "Villa dei Limoni is a hillside property with a pedestrian approach, internal stairs and terraced grounds. These details help guests plan their stay.",
+      "Here are the details that will help you decide whether Villa dei Limoni is right for your stay.",
     items: [
+      { id: "pets", question: "Can we bring a pet?", answer: "We love animals, but we have chosen not to allow them in the house. Pet hair can remain even after deep cleaning, and we want to protect guests with allergies. We are sorry for the inconvenience; if you have a particular need, please write to us before booking." },
+      { id: "services", question: "Are extra cleaning, linen changes or consumables provided during the stay?", answer: "Villa dei Limoni is a private holiday rental, not a hotel or B&B. We cannot provide extra cleaning or linen changes during the stay, nor food or other consumables. Bed linen and towels are supplied for every guest and every rental week." },
       {
         id: "access",
-        question: "How do guests reach the villa?",
+        question: "How does the pedestrian access work?",
         answer:
-          "From the nearest drivable road, the final approach is about 70 metres on foot along a traditional Ligurian stone lane with a gentle incline. The house is not reached directly by car.",
+          "The villa can only be reached on foot. From the nearest road, a few steps and an approximately 80-metre Ligurian stone lane lead gently uphill to the house. The walk takes about one minute, and luggage can be unloaded briefly by the road. Photographs of the route are included in the gallery.",
       },
+      { id: "cottage-privacy", question: "Can the pool cottage be rented to other guests during our stay?", answer: "No. The pool cottage is rented only with the main villa. If the villa guests do not need it, it remains closed." },
+      { id: "pool-season", question: "Is the pool open all year, and is it heated?", answer: "The pool is not heated. It is open from May to October, when the Mediterranean climate is mild." },
+      { id: "rental-contract", question: "Why is a rental agreement required?", answer: "Italian law requires a rental agreement for the reservation to be valid." },
       {
         id: "parking",
-        question: "Is private parking available?",
+        question: "Where can we park during our stay?",
         answer:
-          "Yes. Two private garages are available less than five minutes on foot from the villa.",
+          "Two private garages are available about 200 metres from the villa, less than five minutes on foot—downhill on the way there and uphill on the return. Garage 1 measures 550 × 278 × 190 cm; garage 2 measures 550 × 310 × 185 cm. Further cars may be parked in public spaces along the road, subject to availability, around 5–10 minutes from the villa.",
       },
+      { id: "walk-to-camogli", question: "Can we walk to Camogli?", answer: "Yes. Camogli is 1.4 km from the villa and takes about 20 minutes on foot. The route is downhill on the way there and uphill on the return. Keen walkers will enjoy it, but it is useful to know about the Riviera’s characteristic slopes before you arrive." },
+      { id: "without-car", question: "Can we stay without a car?", answer: "Yes, although we recommend a car for shopping and exploring the area comfortably. Camogli has a railway station and bus service; the nearest stop is about 10 minutes away on foot, on the route linking Ruta, Camogli, Santa Margherita and Recco." },
       {
         id: "mobility",
         question: "Is the property suitable for reduced mobility?",
         answer:
-          "The pedestrian approach, internal stairs and terraced garden include inclines and level changes. The property may be difficult for guests with reduced mobility; review individual needs with the booking platform before reserving.",
+          "Regrettably, no. The steps and sloping path to the house, internal stairs and changes of level in the garden make the property unsuitable for guests with limited mobility. Please contact us before booking and we will gladly provide the details you need.",
       },
       {
         id: "children",
         question: "Are children welcome?",
         answer:
-          "Children are welcome. Because the hillside garden has terraces, steps, elevated areas and dry-stone retaining walls, close adult supervision is essential.",
+          "Children are very welcome, and we can provide two cots and two high chairs on request. The large garden is arranged in terraces bordered by dry-stone walls, with varying drops between levels, so young children should always be supervised by an adult.",
       },
       {
-        id: "pool-season",
-        question: "When is the pool open?",
+        id: "direct-booking",
+        question: "Why book directly with you rather than through a platform?",
         answer:
-          "The pool season runs from May to October. Confirm the exact opening dates for your stay on the booking platform.",
+          "Booking directly avoids platform service fees. Villa dei Limoni is a registered tourist rental, and our CIN appears at the foot of every page. We have welcomed guests since 2018, with verified reviews on Airbnb and Vrbo. You can still book through either platform if you prefer; the final amount will include its service charges.",
       },
-      {
-        id: "stay-length",
-        question: "What is the minimum stay?",
-        answer:
-          "The Airbnb listing currently presents seven-night stays around Sunday arrivals. Live dates and the confirmed reservation are definitive for the selected season.",
-      },
-      {
-        id: "arrival-times",
-        question: "What are the arrival and departure times?",
-        answer:
-          "Check-in begins between 16:00 and 16:30 depending on the booking platform, and check-out is by 10:00. Your confirmed reservation contains the definitive timing.",
-      },
-      {
-        id: "pets-events",
-        question: "Are pets or events allowed?",
-        answer: "Pets and events are not permitted.",
-      },
-      {
-        id: "smoking-age",
-        question: "Are there smoking or age restrictions?",
-        answer:
-          "Vrbo currently lists smoking only in designated areas and a minimum renter age of 28. Rules may differ by channel, so the terms attached to the confirmed reservation prevail.",
-      },
-      {
-        id: "services",
-        question: "Is the villa serviced like a hotel?",
-        answer:
-          "No. This is a private tourist rental, not a hotel or B&B. Extra cleaning, linen changes and consumable goods are not provided during the stay.",
-      },
-      {
-        id: "tourist-tax",
-        question: "Is tourist tax included?",
-        answer:
-          "Camogli tourist tax may apply. As municipal tariffs and platform information can change, the amount and collection method are confirmed when you reserve.",
-      },
-      {
-        id: "booking",
-        question: "Why is booking completed on Airbnb or Vrbo?",
-        answer:
-          "The website is a showcase for the villa. Availability, payments, cancellation terms and reservation support remain within the official booking platform you choose.",
-      },
+      { id: "stay-length", question: "What is the minimum stay, and when are check-in and check-out?", answer: "The minimum stay is seven nights, from Sunday to Sunday. Check-in is from 16:00 to 19:00 and check-out is by 10:00." },
     ],
   },
   footer: {

@@ -20,6 +20,7 @@ interface Props {
     previous: string;
     next: string;
     counter: string;
+    filters: string;
   };
 }
 
@@ -27,7 +28,7 @@ const { images, chapters, labels } = Astro.props;
 ---
 
 <div class="gallery-app" data-gallery-root data-label-counter={labels.counter}>
-  <div class="gallery-filters" aria-label="Gallery filters">
+  <div class="gallery-filters" aria-label={labels.filters}>
     <button class="is-active" type="button" aria-pressed="true" data-gallery-filter="all">{labels.all}</button>
     {chapters.map((chapter) => (
       <button type="button" aria-pressed="false" data-gallery-filter={chapter.id}>{chapter.label}</button>

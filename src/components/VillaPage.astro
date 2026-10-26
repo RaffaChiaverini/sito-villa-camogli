@@ -120,7 +120,7 @@ const rentalData = {
     { "@type": "LocationFeatureSpecification", name: "Sea view", value: true },
     { "@type": "LocationFeatureSpecification", name: "Private garage", value: true },
   ],
-  sameAs: ["https://www.vrbo.com/it-it/affitto-vacanze/p8718530"],
+  sameAs: content.platforms.map((platform) => platform.url),
 };
 const structuredData = {
   "@context": "https://schema.org",
@@ -163,17 +163,16 @@ const structuredData = {
           <p class="eyebrow eyebrow--light hero__eyebrow">{content.hero.eyebrow}</p>
           <h1 class="display" id="hero-title">{content.hero.title}</h1>
           <p class="hero__description">{content.hero.description}</p>
-          <div class="hero__actions"><a class="button button--light" href={contactHref}>{{ en: "Book & contact us", it: "Prenota e contattaci", fr: "Réserver & nous contacter", es: "Reservar y contactarnos" }[locale]}</a></div>
+          <div class="hero__actions"><a class="button button--light" href={contactHref}>{{ en: "Book & contact us", it: "Prenotate e contattateci", fr: "Réservez et contactez-nous", es: "Reservad y contactadnos" }[locale]}</a></div>
         </div>
         <a class="hero__scroll" href="#experience">
           <span>{content.hero.scrollLabel}</span>
           <svg viewBox="0 0 24 38" aria-hidden="true"><path d="M12 1v34m0 0 8-8m-8 8-8-8" /></svg>
         </a>
-        <p class="hero__prototype">Local visual prototype · temporary listing imagery</p>
       </div>
     </section>
 
-    <section class="snapshot" aria-label="Property overview">
+    <section class="snapshot" aria-label={{ en: "Property overview", it: "Dati principali della proprietà", fr: "Aperçu de la propriété", es: "Resumen de la propiedad" }[locale]}>
       <div class="snapshot__track shell">
         {content.facts.map((fact) => (
           <div class="snapshot__fact">
@@ -238,7 +237,7 @@ const structuredData = {
                   </dl>
                   <ul>{mode.features.map((feature) => <li>{feature}</li>)}</ul>
                   <p class="stay-mode__note">{mode.note}</p>
-                  <a class="text-link stay-mode__cta" href={contactHref}>{{ en: "Request dates and rates", it: "Richiedi date e tariffe", fr: "Demander les dates et tarifs", es: "Solicitar fechas y tarifas" }[locale]}</a>
+                  <a class="text-link stay-mode__cta" href={contactHref}>{{ en: "Ask about dates and rates", it: "Richiedete date e tariffe", fr: "Demandez les dates et les tarifs", es: "Consultad fechas y tarifas" }[locale]}</a>
                 </div>
               </article>
             );
@@ -266,6 +265,7 @@ const structuredData = {
             previous: content.gallery.previousLabel,
             next: content.gallery.nextLabel,
             counter: content.gallery.counterLabel,
+            filters: { en: "Gallery filters", it: "Filtri della galleria", fr: "Filtres de la galerie", es: "Filtros de la galería" }[locale],
           }}
         />
       </div>
@@ -373,7 +373,7 @@ const structuredData = {
           <p class="lead">{content.reviews.intro}</p>
         </header>
         <div class="review-scores">
-          {content.reviews.platforms.filter((review) => review.id === "vrbo").map((review) => (
+          {content.reviews.platforms.map((review) => (
             <article data-reveal data-motion>
               <div class="review-score"><strong>{review.score}</strong><span>{review.scale}</span></div>
               <h3>{review.name}</h3>
@@ -424,14 +424,14 @@ const structuredData = {
       <div class="shell booking__content" data-motion>
         <p class="eyebrow eyebrow--light">{content.booking.eyebrow}</p>
         <h2 class="display">{content.booking.title}</h2>
-        <p class="booking__lead">{{ en: "For availability, a tailored quote and booking conditions, contact us directly. We confirm reservations with a rental agreement and bank transfer.", it: "Per disponibilità, preventivo personalizzato e condizioni di prenotazione, contattaci direttamente. Confermiamo le prenotazioni con contratto di locazione e bonifico.", fr: "Pour les disponibilités, un devis sur mesure et les conditions de réservation, contactez-nous directement. Les réservations sont confirmées par contrat de location et virement bancaire.", es: "Para disponibilidad, presupuesto personalizado y condiciones de reserva, contáctanos directamente. Confirmamos las reservas mediante contrato de alquiler y transferencia bancaria." }[locale]}</p>
+        <p class="booking__lead">{{ en: "For availability, a tailored quote and booking conditions, contact us directly. We confirm reservations with a rental agreement and bank transfer.", it: "Per disponibilità, preventivo personalizzato e condizioni di prenotazione, contattateci direttamente. Confermiamo le prenotazioni con contratto di locazione e bonifico.", fr: "Pour connaître les disponibilités, recevoir un devis personnalisé et consulter les conditions de réservation, contactez-nous directement. Nous confirmons les réservations par contrat de location et virement bancaire.", es: "Para consultar la disponibilidad, recibir un presupuesto personalizado y conocer las condiciones de reserva, contactadnos directamente. Confirmamos las reservas mediante contrato de alquiler y transferencia bancaria." }[locale]}</p>
         <div class="booking__facts">
-          <div><span>{{ en: "Availability", it: "Disponibilità", fr: "Disponibilités", es: "Disponibilidad" }[locale]}</span><strong>{{ en: "On request", it: "Su richiesta", fr: "Sur demande", es: "A petición" }[locale]}</strong><p>{{ en: "We do not publish a public availability calendar.", it: "Non pubblichiamo un calendario pubblico delle disponibilità.", fr: "Nous ne publions pas de calendrier de disponibilité public.", es: "No publicamos un calendario público de disponibilidad." }[locale]}</p></div>
-          <div><span>{{ en: "How to book", it: "Come prenotare", fr: "Comment réserver", es: "Cómo reservar" }[locale]}</span><strong>{{ en: "Directly with us", it: "Direttamente con noi", fr: "Directement avec nous", es: "Directamente con nosotros" }[locale]}</strong><p>{{ en: "Email us to receive a proposal, rental agreement and bank-transfer instructions.", it: "Scrivici per ricevere proposta, contratto di locazione e istruzioni per il bonifico.", fr: "Écrivez-nous pour recevoir une proposition, le contrat de location et les instructions de virement.", es: "Escríbenos para recibir una propuesta, contrato de alquiler e instrucciones para la transferencia." }[locale]}</p></div>
+          <div><span>{{ en: "Availability", it: "Disponibilità", fr: "Disponibilités", es: "Disponibilidad" }[locale]}</span><strong>{{ en: "On request", it: "Su richiesta", fr: "Sur demande", es: "Bajo petición" }[locale]}</strong><p>{{ en: "We do not publish a public availability calendar.", it: "Non pubblichiamo un calendario pubblico delle disponibilità.", fr: "Nous ne publions pas de calendrier public des disponibilités.", es: "No publicamos un calendario público de disponibilidad." }[locale]}</p></div>
+          <div><span>{{ en: "How to book", it: "Come prenotare", fr: "Comment réserver", es: "Cómo reservar" }[locale]}</span><strong>{{ en: "Directly with us", it: "Direttamente con noi", fr: "Directement avec nous", es: "Directamente con nosotros" }[locale]}</strong><p>{{ en: "Email us to receive a proposal, rental agreement and bank-transfer instructions.", it: "Scriveteci per ricevere proposta, contratto di locazione e istruzioni per il bonifico.", fr: "Écrivez-nous pour recevoir une proposition, le contrat de location et les instructions de virement.", es: "Escribidnos para recibir una propuesta, el contrato de alquiler y las instrucciones para la transferencia." }[locale]}</p></div>
           <div><span>{{ en: "Tourist tax", it: "Tassa di soggiorno", fr: "Taxe de séjour", es: "Tasa turística" }[locale]}</span><strong>{{ en: "Paid on arrival", it: "Versata all’arrivo", fr: "Payée à l’arrivée", es: "Pagada a la llegada" }[locale]}</strong><p>{{ en: "The tourist tax is the only cost not included and is paid locally on arrival.", it: "La tassa di soggiorno è l’unico costo non incluso e si versa in loco all’arrivo.", fr: "La taxe de séjour est le seul coût non inclus et est payée sur place à l’arrivée.", es: "La tasa turística es el único coste no incluido y se paga localmente a la llegada." }[locale]}</p></div>
         </div>
         <div class="booking__actions">
-          <a class="button button--light" href={contactHref}>{{ en: "Contact us", it: "Contattaci", fr: "Nous contacter", es: "Contáctanos" }[locale]}</a>
+          <a class="button button--light" href={contactHref}>{{ en: "Contact us", it: "Contattateci", fr: "Contactez-nous", es: "Contactadnos" }[locale]}</a>
         </div>
         <p class="booking__note"><a href={`mailto:${propertyIdentity.email}`}>{propertyIdentity.email}</a> · <a href={`tel:${propertyIdentity.telephone.replaceAll(" ", "")}`}>{propertyIdentity.telephone}</a></p>
       </div>
@@ -440,7 +440,7 @@ const structuredData = {
 
   <SiteFooter content={content} />
 
-  <a class="mobile-booking" href={contactHref}>{{ en: "Book & contact us", it: "Prenota e contattaci", fr: "Réserver & nous contacter", es: "Reservar y contactarnos" }[locale]}</a>
+  <a class="mobile-booking" href={contactHref}>{{ en: "Book & contact us", it: "Prenotate e contattateci", fr: "Réservez et contactez-nous", es: "Reservad y contactadnos" }[locale]}</a>
 </BaseLayout>
 
 <style>
@@ -615,6 +615,7 @@ const structuredData = {
   .booking__facts p { margin: .7rem 0 0; color: rgb(244 240 230 / 63%); font-size: .73rem; }
   .booking__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 3rem; }
   .booking__note { max-width: 50rem; margin: 1.2rem 0 0; color: rgb(244 240 230 / 66%); font-size: .73rem; }
+  .booking__note a { display: inline-flex; min-height: 44px; align-items: center; }
 
   .footer { padding-block: 5rem 2rem; }
   .footer__top { display: flex; justify-content: space-between; gap: 3rem; padding-bottom: 5rem; }

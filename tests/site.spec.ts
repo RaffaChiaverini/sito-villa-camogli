@@ -1,19 +1,32 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const VRBO_LISTING = 'https://www.vrbo.com/it-it/affitto-vacanze/p8718530';
+const AIRBNB_LISTING = 'https://www.airbnb.it/rooms/23678485';
 const SITE_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:4321/';
 
 const locales = [
   {
     path: '/',
     lang: /^en(?:-|$)/i,
-    heading: /(?:private|ligurian).*(?:villa|house)|(?:villa|house).*camogli/i,
+    heading: /(?:private|ligurian).*(?:villa|house)|(?:villa|house).*(?:camogli|garden|sea)/i,
     content: /Camogli/i,
   },
   {
     path: '/it/',
     lang: /^it(?:-|$)/i,
-    heading: /(?:villa|dimora).*(?:ligure|Camogli)|Camogli.*(?:villa|dimora)/i,
+    heading: /villa.*(?:giardino|mare|Camogli)|Camogli.*villa/i,
+    content: /Camogli/i,
+  },
+  {
+    path: '/fr/',
+    lang: /^fr(?:-|$)/i,
+    heading: /villa.*(?:jardin|mer|Camogli)|Camogli.*villa/i,
+    content: /Camogli/i,
+  },
+  {
+    path: '/es/',
+    lang: /^es(?:-|$)/i,
+    heading: /villa.*(?:jardín|mar|Camogli)|Camogli.*villa/i,
     content: /Camogli/i,
   },
 ] as const;
@@ -64,8 +77,8 @@ test.describe('localized homepage', () => {
       await expect(page.locator('body')).toContainText(locale.content);
 
       await assertExternalPlatformLink(page, 'Vrbo', VRBO_LISTING);
-      await expect(page.getByRole('link', { name: /book|prenota/i }).first()).toHaveAttribute('href', /contact/);
-      await expect(page.locator(`a[href*="airbnb"]`)).toHaveCount(0);
+      await assertExternalPlatformLink(page, 'Airbnb', AIRBNB_LISTING);
+      await expect(page.getByRole('link', { name: /book|prenota|réserv|reserv/i }).first()).toHaveAttribute('href', /contact/);
     });
   }
 
@@ -88,6 +101,21 @@ test.describe('localized homepage', () => {
           ? page.locator('.desktop-nav .nav-submenu summary').last()
           : page.locator(`.desktop-nav a[href="${path}"]`);
       await expect(locator).toHaveCount(1);
+    }
+  });
+
+  test('French and Spanish practical pages use localized editorial copy', async ({ page }) => {
+    const pages = [
+      { path: '/fr/rates/', expected: /Tarifs hebdomadaires|Tarifs de la villa principale/i },
+      { path: '/fr/arrival/', expected: /Comment rejoindre|En avion/i },
+      { path: '/fr/policies/', expected: /Conditions de réservation|Politique d’annulation/i },
+      { path: '/es/rates/', expected: /Tarifas semanales|Tarifas de la villa principal/i },
+      { path: '/es/arrival/', expected: /Cómo llegar|En avión/i },
+      { path: '/es/policies/', expected: /Condiciones de reserva|Política de cancelación/i },
+    ];
+    for (const item of pages) {
+      await goto(page, item.path);
+      await expect(page.locator('body')).toContainText(item.expected);
     }
   });
 

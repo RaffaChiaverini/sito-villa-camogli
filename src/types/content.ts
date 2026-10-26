@@ -11,7 +11,7 @@ export type SectionId =
   | "booking"
   | "faq";
 
-export type PlatformId = "vrbo";
+export type PlatformId = "airbnb" | "vrbo";
 export type StayModeId = "villa" | "villa-cottage";
 
 export interface SeoContent {
@@ -223,19 +223,7 @@ export interface BookingContent {
 }
 
 export interface FaqItem {
-  id:
-    | "access"
-    | "parking"
-    | "mobility"
-    | "children"
-    | "pool-season"
-    | "stay-length"
-    | "arrival-times"
-    | "pets-events"
-    | "smoking-age"
-    | "services"
-    | "tourist-tax"
-    | "booking";
+  id: string;
   question: string;
   answer: string;
 }

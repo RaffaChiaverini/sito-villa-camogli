@@ -23,6 +23,12 @@ const localeRoot = localeHref(locale, base);
 const homeHref = localeRoot;
 const mediaPath = (src: string) => `${base}${src.replace(/^\//, "")}`;
 const hero = mediaAssets.find((item) => item.id === page.heroImageId) ?? mediaById["hero-view"];
+const mapCopy = {
+  en: { title: "Camogli, San Fruttuoso and Portofino", description: "Schematic map of the coast and Portofino promontory, with Camogli to the north-west, San Fruttuoso on the southern coast and Portofino to the east.", sea: "Ligurian Sea", caption: "Indicative map, not to scale." },
+  it: { title: "Camogli, San Fruttuoso e Portofino", description: "Mappa schematica della costa e del promontorio di Portofino, con Camogli a nord-ovest, San Fruttuoso sulla costa meridionale e Portofino a est.", sea: "Mar Ligure", caption: "Mappa indicativa, non in scala." },
+  fr: { title: "Camogli, San Fruttuoso et Portofino", description: "Carte schématique de la côte et du promontoire de Portofino, avec Camogli au nord-ouest, San Fruttuoso sur la côte sud et Portofino à l’est.", sea: "Mer de Ligurie", caption: "Carte indicative, non à l’échelle." },
+  es: { title: "Camogli, San Fruttuoso y Portofino", description: "Mapa esquemático de la costa y el promontorio de Portofino, con Camogli al noroeste, San Fruttuoso en la costa sur y Portofino al este.", sea: "Mar de Liguria", caption: "Mapa orientativo, no está a escala." },
+}[locale];
 
 const chapterFor = (item: (typeof mediaAssets)[number]) => {
   if (["outdoor-dining", "outdoor-table", "outdoor-oven"].includes(item.id)) return "outdoor-dining";
@@ -100,7 +106,7 @@ const structuredData = {
         { "@type": "LocationFeatureSpecification", name: "Two private garages", value: true },
         { "@type": "LocationFeatureSpecification", name: "Wi-Fi", value: true },
       ],
-      sameAs: ["https://www.vrbo.com/it-it/affitto-vacanze/p8718530"],
+      sameAs: content.platforms.map((platform) => platform.url),
     },
     {
       "@type": "WebPage",
@@ -169,7 +175,7 @@ const structuredData = {
             <p class="eyebrow">{content.gallery.eyebrow}</p>
             <h2 class="section-title" id="gallery-title">{content.gallery.title}</h2>
           </div>
-          <Gallery images={galleryImages} chapters={visibleChapters} labels={{ all: content.gallery.allLabel, open: content.gallery.openLabel, close: content.gallery.closeLabel, previous: content.gallery.previousLabel, next: content.gallery.nextLabel, counter: content.gallery.counterLabel }} />
+          <Gallery images={galleryImages} chapters={visibleChapters} labels={{ all: content.gallery.allLabel, open: content.gallery.openLabel, close: content.gallery.closeLabel, previous: content.gallery.previousLabel, next: content.gallery.nextLabel, counter: content.gallery.counterLabel, filters: { en: "Gallery filters", it: "Filtri della galleria", fr: "Filtres de la galerie", es: "Filtros de la galería" }[locale] }} />
         </div>
       </section>
     )}
@@ -184,6 +190,22 @@ const structuredData = {
             </header>
             <div class="detail-section__body">
               {section.paragraphs?.map((paragraph) => <p class="detail-section__paragraph" data-reveal data-motion>{paragraph}</p>)}
+              {page.showLocationMap && section.id === "map" && (
+                <figure class="area-map" data-reveal data-motion>
+                  <svg viewBox="0 0 800 440" role="img" aria-labelledby="area-map-title area-map-description">
+                    <title id="area-map-title">{mapCopy.title}</title>
+                    <desc id="area-map-description">{mapCopy.description}</desc>
+                    <path class="area-map__land" d="M0 0h800v91c-61 9-103 35-142 68-38 32-73 41-110 51-53 14-91 38-122 79-22 30-44 41-81 52-45 14-89 42-124 99H0Z" />
+                    <path class="area-map__coast" d="M800 91c-61 9-103 35-142 68-38 32-73 41-110 51-53 14-91 38-122 79-22 30-44 41-81 52-45 14-89 42-124 99" />
+                    <path class="area-map__trail" d="M165 133c86 13 146 54 212 129 41 47 77 65 127 79" />
+                    <g class="area-map__place" transform="translate(165 133)"><circle r="7"/><text x="15" y="5">Camogli</text></g>
+                    <g class="area-map__place" transform="translate(377 262)"><circle r="7"/><text x="15" y="5">San Fruttuoso</text></g>
+                    <g class="area-map__place" transform="translate(504 341)"><circle r="7"/><text x="15" y="5">Portofino</text></g>
+                    <text class="area-map__sea" x="610" y="300">{mapCopy.sea}</text>
+                  </svg>
+                  <figcaption>{mapCopy.caption}</figcaption>
+                </figure>
+              )}
               {section.items && (
                 <div class="detail-cards">
                   {section.items.map((item) => (
@@ -191,7 +213,7 @@ const structuredData = {
                       {item.meta && <span>{item.meta}</span>}
                       <h3>{item.title}</h3>
                       {item.description && <p>{item.description}</p>}
-                      {item.href && <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}>{{ en: "Open", it: "Apri", fr: "Ouvrir", es: "Abrir" }[locale]}<span aria-hidden="true">↗</span></a>}
+                      {item.href && <a href={item.href} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener noreferrer" : undefined}>{{ en: "Open", it: "Aprite", fr: "Ouvrir", es: "Abrir" }[locale]}<span aria-hidden="true">↗</span></a>}
                     </article>
                   ))}
                 </div>
@@ -207,8 +229,8 @@ const structuredData = {
       <section class="section contact-form-section" aria-labelledby="contact-form-title">
         <div class="shell contact-form-section__grid">
           <header>
-            <p class="eyebrow">{{ en: "Direct enquiry", it: "Richiesta diretta", fr: "Demande directe", es: "Consulta directa" }[locale]}</p>
-            <h2 class="section-title" id="contact-form-title">{{ en: "Tell us about your stay.", it: "Raccontaci il tuo soggiorno.", fr: "Parlez-nous de votre séjour.", es: "Cuéntanos sobre tu estancia." }[locale]}</h2>
+            <p class="eyebrow">{{ en: "Direct enquiry", it: "Contatto diretto", fr: "Demande directe", es: "Consulta directa" }[locale]}</p>
+            <h2 class="section-title" id="contact-form-title">{{ en: "Send us your enquiry.", it: "Scriveteci la vostra richiesta.", fr: "Écrivez-nous.", es: "Escribidnos vuestra consulta." }[locale]}</h2>
           </header>
           <form class="contact-form" action={`mailto:${propertyIdentity.email}`} method="get" data-contact-form novalidate>
             <label>{{ en: "Name", it: "Nome", fr: "Nom", es: "Nombre" }[locale]}<input name="name" autocomplete="name" required /></label>
@@ -216,7 +238,7 @@ const structuredData = {
             <label>{{ en: "Telephone (optional)", it: "Telefono (facoltativo)", fr: "Téléphone (facultatif)", es: "Teléfono (opcional)" }[locale]}<input name="telephone" type="tel" autocomplete="tel" /></label>
             <label>{{ en: "Preferred dates and number of guests", it: "Date desiderate e numero di ospiti", fr: "Dates souhaitées et nombre de voyageurs", es: "Fechas preferidas y número de huéspedes" }[locale]}<textarea name="message" rows="6" required></textarea></label>
             <button class="button" type="submit">{{ en: "Prepare email", it: "Prepara l’email", fr: "Préparer l’e-mail", es: "Preparar el correo" }[locale]}</button>
-            <p>{{ en: "This prepares an email with your details. You will need to review it and press Send in your email application; it does not reserve dates.", it: "Il modulo prepara un’email con i tuoi dati. Dovrai controllarla e premere Invia nel programma email; non blocca le date.", fr: "Le formulaire prépare un e-mail avec vos informations. Vous devrez le vérifier puis cliquer sur Envoyer dans votre application e-mail ; il ne réserve pas les dates.", es: "El formulario prepara un correo con tus datos. Deberás revisarlo y pulsar Enviar en tu aplicación de correo; no reserva fechas." }[locale]}</p>
+            <p>{{ en: "This prepares an email with your details. You will need to review it and press Send in your email application; it does not reserve dates.", it: "Il modulo prepara un’email con i vostri dati. Dovrete controllarla e premere Invia nel programma email; non blocca le date.", fr: "Le formulaire prépare un e-mail avec vos informations. Vous devrez le vérifier puis cliquer sur Envoyer dans votre application e-mail ; il ne réserve pas les dates.", es: "El formulario prepara un correo con vuestros datos. Deberéis revisarlo y pulsar Enviar en vuestra aplicación de correo; no reserva fechas." }[locale]}</p>
           </form>
         </div>
       </section>
@@ -281,6 +303,15 @@ const structuredData = {
   .detail-notice { margin-top: 3rem; padding: 1.5rem 1.75rem; border-left: 2px solid var(--terracotta); background: rgb(216 208 193 / 35%); }
   .detail-notice span { color: var(--terracotta); font-size: .62rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
   .detail-notice p { max-width: 48rem; margin: .6rem 0 0; color: var(--ink-soft); }
+  .area-map { margin: 2.75rem 0 0; }
+  .area-map svg { display: block; width: 100%; height: auto; border: 1px solid var(--rule); background: #c9d9da; }
+  .area-map__land { fill: #e9e1cf; }
+  .area-map__coast { fill: none; stroke: var(--ink); stroke-width: 2; }
+  .area-map__trail { fill: none; stroke: var(--terracotta); stroke-dasharray: 7 8; stroke-linecap: round; stroke-width: 2.5; }
+  .area-map__place circle { fill: var(--terracotta); stroke: var(--paper); stroke-width: 3; }
+  .area-map__place text { fill: var(--ink); font: 650 17px var(--font-body); letter-spacing: .04em; }
+  .area-map__sea { fill: rgb(13 64 82 / 54%); font: italic 30px var(--font-display); }
+  .area-map figcaption { margin-top: .6rem; color: var(--ink-soft); font-size: .66rem; letter-spacing: .08em; text-align: right; text-transform: uppercase; }
   .detail-gallery__heading { display: grid; grid-template-columns: 1fr 2fr; margin-bottom: 3rem; }
   .detail-conversion { padding-block: clamp(5rem, 10vw, 10rem); }
   .contact-form-section { background: var(--ivory); }

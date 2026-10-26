@@ -33,30 +33,31 @@ const legalLinks = {
 const siteLinks = {
   en: [
       ["Property", "villa"], ["Spaces", "rooms-floorplans"], ["Amenities", "amenities"],
-      ["Surroundings", "location"], ["Gallery", "gallery"], ["Reviews", "reviews"],
+      ["Surroundings", "location"], ["Getting here", "arrival"], ["Gallery", "gallery"], ["Reviews", "reviews"],
       ["Rates", "rates"], ["What is included", "rates/#rate-status"], ["Booking conditions", "policies"], ["Book & contact", "contact"],
     ],
   it: [
       ["Proprietà", "villa"], ["Spazi", "rooms-floorplans"], ["Dotazioni", "amenities"],
-      ["Dintorni", "location"], ["Galleria", "gallery"], ["Recensioni", "reviews"],
-      ["Tariffe", "rates"], ["Cosa è incluso", "rates/#rate-status"], ["Condizioni di prenotazione", "policies"], ["Prenota e contattaci", "contact"],
+      ["Dintorni", "location"], ["Come arrivare", "arrival"], ["Galleria", "gallery"], ["Recensioni", "reviews"],
+      ["Tariffe", "rates"], ["Cosa è incluso", "rates/#rate-status"], ["Condizioni di prenotazione", "policies"], ["Prenotate e contattateci", "contact"],
     ],
-  fr: [["Propriété", "villa"], ["Espaces", "rooms-floorplans"], ["Équipements", "amenities"], ["Environs", "location"], ["Galerie", "gallery"], ["Avis", "reviews"], ["Tarifs", "rates"], ["Ce qui est inclus", "rates/#rate-status"], ["Conditions de réservation", "policies"], ["Réserver & contacter", "contact"]],
-  es: [["Propiedad", "villa"], ["Espacios", "rooms-floorplans"], ["Servicios", "amenities"], ["Alrededores", "location"], ["Galería", "gallery"], ["Opiniones", "reviews"], ["Tarifas", "rates"], ["Qué está incluido", "rates/#rate-status"], ["Condiciones de reserva", "policies"], ["Reservar y contactar", "contact"]],
+  fr: [["Propriété", "villa"], ["Espaces", "rooms-floorplans"], ["Équipements", "amenities"], ["Environs", "location"], ["Comment venir", "arrival"], ["Galerie", "gallery"], ["Avis", "reviews"], ["Tarifs", "rates"], ["Ce qui est inclus", "rates/#rate-status"], ["Conditions de réservation", "policies"], ["Réservez et contactez-nous", "contact"]],
+  es: [["Propiedad", "villa"], ["Espacios", "rooms-floorplans"], ["Servicios", "amenities"], ["Alrededores", "location"], ["Cómo llegar", "arrival"], ["Galería", "gallery"], ["Opiniones", "reviews"], ["Tarifas", "rates"], ["Qué está incluido", "rates/#rate-status"], ["Condiciones de reserva", "policies"], ["Reservad y contactadnos", "contact"]],
 }[content.locale];
 const languageLinks = locales.map((locale) => ({ locale, name: localeNames[locale], href: localeHref(locale, base) }));
 const factsLabel = { en: "Property facts", it: "Dati della proprietà", fr: "Informations sur la propriété", es: "Datos de la propiedad" }[content.locale];
+const reviewsLabel = { en: "reviews", it: "recensioni", fr: "avis", es: "opiniones" }[content.locale];
 ---
 
 <footer class="footer surface-ink">
   <div class="shell footer__top">
     <div class="footer__brand">
-      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M15.3 10.1c5.8-.9 10.2 2.8 9.3 8.4-.8 5.2-5 8.6-9.3 9.3-4.3-.7-8.5-4.1-9.3-9.3-.9-5.6 3.5-9.3 9.3-8.4Z"/><path d="M15.5 10.1c.7-3.5 3.6-5.6 7.1-5.1-1.4 3.3-4 5.1-7.1 5.1Z"/><path d="M15.4 10.2 17 7.5"/></svg>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path class="footer__lemon" d="M3.5 16c2.7-1.8 2.8-4.5 5.1-6.8 3.8-3.8 10.3-4.2 14.4-.8 2.3 1.9 3.6 4.4 5.5 7.6-1.9 3.2-3.2 5.7-5.5 7.6-4.1 3.4-10.6 3-14.4-.8-2.3-2.3-2.4-5-5.1-6.8Z"/><path class="footer__leaf" d="M18.8 8C20 3.2 24.7 1.1 29 3.2c-2.4 4-5.9 5.6-10.2 4.8Z"/><path class="footer__vein" d="m19.1 7.7 6.3-3.4M19.1 8l-2.4 2.3"/></svg>
       <strong>{content.brandName}</strong><span>{content.footer.strapline}</span>
     </div>
     <div class="footer__links">
       {siteLinks.map(([label, slug]) => <a href={route(slug)}>{label}</a>)}
-      {content.platforms.filter((platform) => platform.id === "vrbo").map((platform) => <a href={platform.url} target="_blank" rel="noopener noreferrer" aria-label={platform.externalLabel}>{platform.name} · recensioni ↗</a>)}
+      {content.platforms.map((platform) => <a href={platform.url} target="_blank" rel="noopener noreferrer" aria-label={platform.externalLabel}>{platform.name} · {reviewsLabel} ↗</a>)}
       {languageLinks.map(({ locale, name, href }) => <a href={href} hreflang={locale} lang={locale} aria-current={locale === content.locale ? "page" : undefined} data-locale-choice={locale}>{name}</a>)}
     </div>
   </div>
@@ -80,7 +81,10 @@ const factsLabel = { en: "Property facts", it: "Dati della proprietà", fr: "Inf
   .footer__top { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
   .footer__brand { display: grid; grid-template-columns: auto 1fr; column-gap: 1rem; align-items: center; }
   .footer__brand svg { grid-row: 1 / 3; width: 2.35rem; }
-  .footer__brand svg path { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.35; }
+  .footer__brand svg path { stroke-linecap: round; stroke-linejoin: round; }
+  .footer__lemon { fill: var(--citrus); stroke: currentColor; stroke-width: 1.15; }
+  .footer__leaf { fill: #78905f; stroke: currentColor; stroke-width: 1.1; }
+  .footer__vein { fill: none; stroke: currentColor; stroke-width: 1; }
   .footer__brand strong { font-family: var(--font-display); font-size: 1.55rem; font-weight: 430; }
   .footer__brand span { color: rgb(244 240 230 / 64%); font-size: .72rem; }
   .footer__links { display: grid; grid-template-columns: repeat(3, minmax(7rem, 1fr)); gap: 0 1.5rem; }

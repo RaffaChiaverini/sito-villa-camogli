@@ -47,6 +47,14 @@ test.describe("blueprint launch delta", () => {
     }
   });
 
+  test("Italian arrival guidance and surroundings map are published", async ({ page }) => {
+    await goto(page, "/it/arrival/");
+    await expect(page.locator("body")).toContainText(/aereo|treno|ultimo tratto/i);
+    await goto(page, "/it/location/");
+    await expect(page.locator(".area-map")).toHaveCount(1);
+    await expect(page.locator("body")).toContainText(/San Fruttuoso|Portofino/i);
+  });
+
   test("registration identifiers and legal surfaces are visible", async ({ page }) => {
     await goto(page, "/legal/");
     await expect(page.locator("body")).toContainText("IT010007C2DQK53S7U");

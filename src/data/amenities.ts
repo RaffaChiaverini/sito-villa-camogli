@@ -71,6 +71,7 @@ export const amenityGroups: AmenityGroup[] = [
       { label: { en: "Air conditioning in every bedroom", it: "Aria condizionata in ogni camera", fr: "Climatisation dans chaque chambre", es: "Aire acondicionado en todos los dormitorios" }, status: "included" },
       { label: { en: "Wi-Fi", it: "Wi-Fi", fr: "Wi-Fi", es: "Wi-Fi" }, status: "included" },
       { label: { en: "Washing machine", it: "Lavatrice", fr: "Lave-linge", es: "Lavadora" }, status: "included" },
+      { label: { en: "Weekly bed linen and towels", it: "Fornitura settimanale di biancheria da letto e asciugamani", fr: "Linge de lit et serviettes fournis chaque semaine", es: "Ropa de cama y toallas semanales" }, status: "included" },
     ],
   },
   {
@@ -79,7 +80,7 @@ export const amenityGroups: AmenityGroup[] = [
     items: [
       { label: { en: "Two cots and two high chairs", it: "Due lettini e due seggioloni", fr: "Deux lits bébé et deux chaises hautes", es: "Dos cunas y dos tronas" }, status: "on-request" },
       { label: { en: "Two private garages", it: "Due garage privati", fr: "Deux garages privés", es: "Dos garajes privados" }, status: "included" },
-      { label: { en: "Final 70 m pedestrian stone path", it: "Ultimi 70 m su percorso pedonale in pietra", fr: "70 derniers mètres sur un chemin piéton en pierre", es: "Últimos 70 m por un camino peatonal de piedra" }, status: "included", note: { en: "The path, internal stairs and terraced grounds may be difficult for reduced mobility.", it: "Il percorso, le scale interne e il giardino terrazzato possono essere difficili per chi ha mobilità ridotta.", fr: "Le chemin, les escaliers et le terrain en terrasses peuvent être difficiles en cas de mobilité réduite.", es: "El camino, las escaleras interiores y el terreno en terrazas pueden ser difíciles para personas con movilidad reducida." } },
+      { label: { en: "Final 80 m pedestrian stone path", it: "Ultimi 80 m su percorso pedonale in pietra", fr: "80 derniers mètres sur un chemin piéton en pierre", es: "Últimos 80 m por un camino peatonal de piedra" }, status: "included", note: { en: "The path, internal stairs and terraced grounds may be difficult for guests with reduced mobility.", it: "Il percorso, le scale interne e il giardino terrazzato possono essere difficili per chi ha mobilità ridotta.", fr: "Le chemin, les escaliers et le terrain en terrasses peuvent être difficiles en cas de mobilité réduite.", es: "El camino, las escaleras interiores y el terreno en terrazas pueden ser difíciles para personas con movilidad reducida." } },
     ],
   },
   {
